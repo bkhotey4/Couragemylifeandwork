@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>整夜睡眠音樂</title>
+<meta name="description" content="在瀏覽器裡即時生成的睡眠音樂，可播放 30 分鐘到 8 小時：海浪、細雨、溫柔和弦與遠方鈴聲。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* 夜間頁面：淺色與深色模式都使用低亮度配色，避免睡前刺眼 */
+  :root {
+    --bg: #0f1420;
+    --surface: #161d2c;
+    --ink: #d9dde6;
+    --muted: #8b94a7;
+    --line: #253049;
+    --accent: #8fb3e8;
+    --glow: rgba(143, 179, 232, .18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b0f18; --surface: #121826; }
+  }
+  :root[data-theme="dark"] { --bg: #0b0f18; --surface: #121826; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans TC", system-ui, sans-serif;
+    line-height: 1.7;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 48px 16px 60px; text-align: center; }
+  a.back { color: var(--muted); font-size: .9rem; text-decoration: none; }
+  a.back:hover { color: var(--accent); }
+  h1 { font-family: "Noto Serif TC", serif; font-size: clamp(1.7rem, 6vw, 2.4rem); margin: 18px 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 32px; }
+  .orb-wrap { display: grid; place-items: center; height: 240px; }
+  .orb {
+    width: 150px; height: 150px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, var(--accent), transparent 70%);
+    box-shadow: 0 0 80px 20px var(--glow);
+    opacity: .55;
+    transform: scale(.8);
+  }
+  .playing .orb { animation: breathe 12s ease-in-out infinite; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(.8); opacity: .45; }
+    45% { transform: scale(1.12); opacity: .8; }
+  }
+  .hint { color: var(--muted); font-size: .9rem; min-height: 1.7em; }
+  .time { font-size: 2.6rem; font-variant-numeric: tabular-nums; letter-spacing: .04em; margin: 8px 0 20px; }
+  .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  button, select {
+    font: inherit;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    padding: 10px 22px;
+    cursor: pointer;
+  }
+  button.primary { background: var(--accent); color: #0b0f18; border-color: var(--accent); font-weight: 500; }
+  button:disabled, select:disabled { opacity: .45; cursor: default; }
+  .mixer {
+    margin: 34px 0 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px 20px;
+    text-align: left;
+  }
+  .mixer label { display: grid; grid-template-columns: 5.5em 1fr; align-items: center; gap: 12px; margin: 8px 0; color: var(--muted); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .note { color: var(--muted); font-size: .85rem; margin-top: 28px; text-align: left; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <a class="back" href="./">← 回到「考績之後，再站起來」</a>
+  <h1>今晚，先好好睡一覺</h1>
+  <p class="sub">海浪、細雨、溫柔的和弦與遠方的鈴聲。<br>每一次播放都是即時生成，不會完全重複。</p>
+
+  <div class="orb-wrap"><div class="orb"></div></div>
+  <div class="hint" id="hint">跟著光慢慢吸氣、慢慢吐氣</div>
+  <div class="time" id="time">7:00:00</div>
+
+  <div class="row">
+    <select id="len" aria-label="播放長度">
+      <option value="30">30 分鐘</option>
+      <option value="60">1 小時</option>
+      <option value="90">1.5 小時</option>
+      <option value="120">2 小時</option>
+      <option value="240">4 小時</option>
+      <option value="360">6 小時</option>
+      <option value="420" selected>7 小時</option>
+      <option value="480">8 小時</option>
+    </select>
+    <button class="primary" id="play" type="button">開始播放</button>
+    <button id="stop" type="button" disabled>結束</button>
+  </div>
+
+  <div class="mixer">
+    <label>總音量 <input id="v-master" type="range" min="0" max="1" step="0.01" value="0.7"></label>
+    <label>海浪 <input id="v-waves" type="range" min="0" max="1" step="0.01" value="0.6"></label>
+    <label>細雨 <input id="v-rain" type="range" min="0" max="1" step="0.01" value="0.3"></label>
+    <label>和弦 <input id="v-pad" type="range" min="0" max="1" step="0.01" value="0.55"></label>
+    <label>鈴聲 <input id="v-bells" type="range" min="0" max="1" step="0.01" value="0.35"></label>
+  </div>
+
+  <p class="note">
+    可選 30 分鐘到 8 小時。音樂會在結尾慢慢淡出（整夜模式只淡出最後 30 分鐘），時間到自動停止。<br>
+    部分手機（尤其 iPhone）在螢幕鎖定後會暫停網頁聲音，建議把螢幕亮度調到最低、保持畫面開著，或接上藍牙喇叭。
+  </p>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  // 和弦（MIDI 音高），都落在 C 大調裡，低音區、開放排列，聽起來柔和
+  const CHORDS = [
+    [48, 55, 64, 71], // Cmaj7
+    [45, 52, 60, 67], // Am7
+    [41, 48, 57, 64], // Fmaj7
+    [43, 50, 57, 62], // G sus
+    [40, 47, 55, 62], // Em7
+    [38, 45, 53, 60]  // Dm7
+  ];
+  const BELLS = [72, 74, 76, 79, 81, 84]; // C 大調五聲音階
+
+  let ctx = null, nodes = null, timer = null;
+  let startAt = 0, total = 0, nextChord = 0, nextBell = 0, lastChord = -1;
+
+  function noiseBuffer(type) {
+    const len = ctx.sampleRate * 12;
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch);
+      let last = 0;
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        if (type === "brown") { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+        else d[i] = w;
+      }
+    }
+    return buf;
+  }
+
+  function reverbBuffer(seconds) {
+    const len = ctx.sampleRate * seconds;
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    }
+    return buf;
+  }
+
+  function build() {
+    const user = ctx.createGain();
+    const fade = ctx.createGain();
+    const comp = ctx.createDynamicsCompressor();
+    user.connect(fade).connect(comp).connect(ctx.destination);
+
+    const reverb = ctx.createConvolver();
+    reverb.buffer = reverbBuffer(5);
+    const wet = ctx.createGain();
+    wet.gain.value = 0.6;
+    reverb.connect(wet).connect(user);
+
+    const bus = name => { const g = ctx.createGain(); g.connect(user); return g; };
+    const waves = bus(), rain = bus(), pad = bus(), bells = bus();
+    pad.connect(reverb);
+    bells.connect(reverb);
+
+    // 海浪：低通的布朗噪音，用極慢的 LFO 推拉音量
+    const brown = ctx.createBufferSource();
+    brown.buffer = noiseBuffer("brown");
+    brown.loop = true;
+    const waveLp = ctx.createBiquadFilter();
+    waveLp.type = "lowpass";
+    waveLp.frequency.value = 700;
+    const swell = ctx.createGain();
+    swell.gain.value = 0.55;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.075;
+    const lfoDepth = ctx.createGain();
+    lfoDepth.gain.value = 0.4;
+    lfo.connect(lfoDepth).connect(swell.gain);
+    brown.connect(waveLp).connect(swell).connect(waves);
+
+    // 細雨：帶通的白噪音，非常小聲
+    const white = ctx.createBufferSource();
+    white.buffer = noiseBuffer("white");
+    white.loop = true;
+    const rainBp = ctx.createBiquadFilter();
+    rainBp.type = "bandpass";
+    rainBp.frequency.value = 3200;
+    rainBp.Q.value = 0.6;
+    const rainLevel = ctx.createGain();
+    rainLevel.gain.value = 0.12;
+    white.connect(rainBp).connect(rainLevel).connect(rain);
+
+    const padLp = ctx.createBiquadFilter();
+    padLp.type = "lowpass";
+    padLp.frequency.value = 1100;
+    padLp.connect(pad);
+
+    brown.start(); white.start(); lfo.start();
+    nodes = { user, fade, waves, rain, pad, bells, padLp };
+    applyMix();
+  }
+
+  function applyMix() {
+    if (!nodes) return;
+    const t = ctx.currentTime;
+    nodes.user.gain.setTargetAtTime(+$("v-master").value, t, 0.3);
+    nodes.waves.gain.setTargetAtTime(+$("v-waves").value, t, 0.3);
+    nodes.rain.gain.setTargetAtTime(+$("v-rain").value, t, 0.3);
+    nodes.pad.gain.setTargetAtTime(+$("v-pad").value * 0.5, t, 0.3);
+    nodes.bells.gain.setTargetAtTime(+$("v-bells").value * 0.5, t, 0.3);
+  }
+
+  function playChord(at, dur) {
+    let i;
+    do { i = Math.floor(Math.random() * CHORDS.length); } while (i === lastChord);
+    lastChord = i;
+    CHORDS[i].forEach((m, k) => {
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0, at);
+      env.gain.linearRampToValueAtTime(0.09, at + 6);
+      env.gain.setValueAtTime(0.09, at + dur - 8);
+      env.gain.linearRampToValueAtTime(0, at + dur);
+      const pan = ctx.createStereoPanner();
+      pan.pan.value = (k / 3 - 0.5) * 0.8;
+      env.connect(pan).connect(nodes.padLp);
+      [["sine", 0], ["triangle", 4]].forEach(([type, cents]) => {
+        const o = ctx.createOscillator();
+        o.type = type;
+        o.frequency.value = mtof(m);
+        o.detune.value = cents;
+        o.connect(env);
+        o.start(at);
+        o.stop(at + dur + 0.1);
+      });
+    });
+  }
+
+  function playBell(at) {
+    const f = mtof(BELLS[Math.floor(Math.random() * BELLS.length)]);
+    const pan = ctx.createStereoPanner();
+    pan.pan.value = Math.random() * 1.4 - 0.7;
+    pan.connect(nodes.bells);
+    [[1, 0.16, 6], [2.76, 0.04, 2.5]].forEach(([ratio, peak, decay]) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.frequency.value = f * ratio;
+      g.gain.setValueAtTime(0, at);
+      g.gain.linearRampToValueAtTime(peak, at + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + decay);
+      o.connect(g).connect(pan);
+      o.start(at);
+      o.stop(at + decay + 0.1);
+    });
+  }
+
+  // 預先排程 90 秒，背景分頁計時器被節流時音樂也不會斷
+  function schedule() {
+    const horizon = ctx.currentTime + 90;
+    const end = startAt + total;
+    while (nextChord < horizon && nextChord < end) {
+      playChord(nextChord, 24);
+      nextChord += 16;
+    }
+    while (nextBell < horizon && nextBell < end) {
+      const progress = (nextBell - startAt) / total;
+      playBell(nextBell);
+      // 越接近尾聲，鈴聲越稀疏
+      nextBell += (7 + Math.random() * 9) * (1 + progress * 1.5);
+    }
+  }
+
+  function tick() {
+    const elapsed = ctx.currentTime - startAt;
+    const left = Math.max(0, total - elapsed);
+    $("time").textContent = fmt(left);
+    if (left <= 0) { stop(true); return; }
+    schedule();
+  }
+
+  function fmt(s) {
+    s = Math.ceil(s);
+    const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+    return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  }
+
+  function start() {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    total = +$("len").value * 60;
+    build();
+    startAt = ctx.currentTime + 0.1;
+    nodes.fade.gain.setValueAtTime(0, startAt);
+    nodes.fade.gain.linearRampToValueAtTime(1, startAt + 20);
+    // 短時段淡出最後 1/4，長時段（整夜）只淡出最後 30 分鐘
+    nodes.fade.gain.setValueAtTime(1, startAt + total - Math.min(total * 0.25, 1800));
+    nodes.fade.gain.linearRampToValueAtTime(0, startAt + total);
+    nextChord = startAt;
+    nextBell = startAt + 10;
+    schedule();
+    timer = setInterval(tick, 1000);
+    setPlaying(true);
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({ title: "整夜睡眠音樂", artist: "Courage · My Life and Work" });
+    }
+  }
+
+  function togglePause() {
+    if (ctx.state === "running") { ctx.suspend(); setPlaying(false, true); }
+    else { ctx.resume(); setPlaying(true); }
+  }
+
+  function stop(finished) {
+    clearInterval(timer);
+    if (ctx) ctx.close();
+    ctx = null; nodes = null;
+    setPlaying(false);
+    $("play").textContent = "開始播放";
+    $("stop").disabled = true;
+    $("len").disabled = false;
+    $("time").textContent = fmt(+$("len").value * 60);
+    $("hint").textContent = finished ? "晚安。明天的你，會比今天更有力量。" : "跟著光慢慢吸氣、慢慢吐氣";
+  }
+
+  function setPlaying(on, paused) {
+    $("app").classList.toggle("playing", on);
+    $("play").textContent = on ? "暫停" : (paused ? "繼續" : "開始播放");
+    $("stop").disabled = false;
+    $("len").disabled = true;
+    $("hint").textContent = on ? "吸氣……　　吐氣……" : (paused ? "已暫停" : $("hint").textContent);
+  }
+
+  $("play").addEventListener("click", () => (ctx ? togglePause() : start()));
+  $("stop").addEventListener("click", () => stop(false));
+  $("len").addEventListener("change", () => { $("time").textContent = fmt(+$("len").value * 60); });
+  document.querySelectorAll(".mixer input").forEach(el => el.addEventListener("input", applyMix));
+})();
+</script>
+</body>
+</html>
