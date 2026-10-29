@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>考績之後，再站起來</title>
+<meta name="description" content="給被考績打擊的科技人：九則真實歷史故事，關於跌倒之後怎麼站起來。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f4ee;
+    --surface: #ffffff;
+    --ink: #1f2328;
+    --muted: #5d6470;
+    --line: #e4dfd5;
+    --accent: #b5452b;
+    --accent-soft: #f6e4dd;
+    --chip: #efeae0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15171b;
+      --surface: #1e2127;
+      --ink: #ece8e1;
+      --muted: #a3a9b3;
+      --line: #2f333b;
+      --accent: #e8805f;
+      --accent-soft: #3a2621;
+      --chip: #2a2e35;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15171b;
+    --surface: #1e2127;
+    --ink: #ece8e1;
+    --muted: #a3a9b3;
+    --line: #2f333b;
+    --accent: #e8805f;
+    --accent-soft: #3a2621;
+    --chip: #2a2e35;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans TC", system-ui, sans-serif;
+    line-height: 1.8;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 72px 0 40px; }
+  .eyebrow { color: var(--accent); font-weight: 700; letter-spacing: .12em; font-size: .85rem; }
+  h1 {
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    line-height: 1.3;
+    margin: 12px 0 20px;
+  }
+  .lead { color: var(--muted); font-size: 1.08rem; max-width: 40em; }
+  .quote-box {
+    margin: 36px 0 8px;
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .quote-box p { margin: 0; font-family: "Noto Serif TC", serif; font-size: 1.2rem; }
+  .quote-box small { color: var(--muted); display: block; margin-top: 6px; }
+  button {
+    font: inherit;
+    margin-top: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 18px;
+    cursor: pointer;
+  }
+  button:hover { filter: brightness(1.08); }
+  nav.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 40px 0 20px; }
+  nav.filters button {
+    margin: 0;
+    background: var(--chip);
+    color: var(--ink);
+    padding: 6px 14px;
+    font-size: .92rem;
+  }
+  nav.filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  .story {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 26px 24px;
+    margin-bottom: 18px;
+  }
+  .story .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+  .story h2 { font-family: "Noto Serif TC", serif; font-size: 1.45rem; margin: 0; }
+  .story .when { color: var(--muted); font-size: .9rem; }
+  .story h3 { font-size: .85rem; color: var(--accent); letter-spacing: .08em; margin: 18px 0 2px; }
+  .story p { margin: 4px 0; }
+  .story .lesson {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+    font-weight: 500;
+  }
+  .story .lesson::before { content: "給今天的你 → "; color: var(--accent); }
+  section.toolkit { margin: 56px 0; }
+  section.toolkit h2 { font-family: "Noto Serif TC", serif; font-size: 1.7rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .tip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  .tip b { display: block; margin-bottom: 4px; }
+  .tip span { color: var(--muted); font-size: .95rem; }
+  footer { color: var(--muted); font-size: .85rem; padding: 32px 0 60px; border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">COURAGE · MY LIFE AND WORK</div>
+    <h1>考績只是一張表，<br>不是你這個人的定論。</h1>
+    <p class="lead">在半導體與科技業，一次考績可能讓人懷疑自己好幾個月。但歷史上許多人，都曾在更低的谷底被「打了很差的分數」——後來卻寫出了最好的作品。下面這幾則真實故事，送給剛拿到考績、需要喘一口氣的你。</p>
+
+    <div class="quote-box" aria-live="polite">
+      <p id="q-text">莫聽穿林打葉聲，何妨吟嘯且徐行。</p>
+      <small id="q-src">— 蘇軾〈定風波〉，寫於被貶黃州期間</small>
+      <button id="q-btn" type="button">換一句</button>
+    </div>
+  </header>
+
+  <nav class="filters" aria-label="篩選故事">
+    <button type="button" data-f="all" aria-pressed="true">全部</button>
+    <button type="button" data-f="tech" aria-pressed="false">科技／半導體</button>
+    <button type="button" data-f="east" aria-pressed="false">東方歷史</button>
+    <button type="button" data-f="west" aria-pressed="false">西方歷史</button>
+  </nav>
+
+  <main id="stories">
+    <article class="story" data-c="tech">
+      <div class="meta"><h2>張忠謀：五十多歲被調離核心，才開始最重要的事業</h2></div>
+      <div class="when">1983–1987</div>
+      <h3>谷底</h3>
+      <p>他在德州儀器做到負責全球半導體業務的資深副總裁，卻在 1983 年被調離半導體核心、晉升執行長之路也斷了，於是離開服務了二十五年的公司。之後到通用器材（General Instrument）擔任總裁，約一年就因理念不合離開。這時他已經五十多歲。</p>
+      <h3>站起來</h3>
+      <p>1985 年他回台出任工研院院長，1987 年創立台積電，提出當時沒人看好的「專業晶圓代工」模式——後來改變了整個產業。</p>
+      <p class="lesson">被調職、被看衰、甚至被「打了不及格」，不代表你的能力歸零。它可能只是在告訴你：這個位置裝不下你想做的事。</p>
+    </article>
+
+    <article class="story" data-c="tech">
+      <div class="meta"><h2>黃仁勳與 NVIDIA：第一顆晶片失敗，公司差點撐不下去</h2></div>
+      <div class="when">1995–1997</div>
+      <h3>谷底</h3>
+      <p>NVIDIA 第一款產品 NV1 選錯了技術路線，市場反應冷淡；為 Sega 開發的後續晶片也因方向錯誤而停擺，公司資金所剩無幾，不得不大幅裁員。</p>
+      <h3>站起來</h3>
+      <p>黃仁勳坦白向合作夥伴承認錯誤，團隊轉向業界標準，背水一戰推出 RIVA 128，幾個月內大賣，公司才活了下來。他後來常說，公司「離倒閉只有三十天」的感覺從沒忘過。</p>
+      <p class="lesson">承認「這次做錯了」不丟臉，能快速修正方向才是真本事。一次失敗的專案，不等於一個失敗的工程師。</p>
+    </article>
+
+    <article class="story" data-c="tech">
+      <div class="meta"><h2>賈伯斯：被自己創立的公司開除</h2></div>
+      <div class="when">1985–1997</div>
+      <h3>谷底</h3>
+      <p>1985 年，三十歲的賈伯斯在董事會權力鬥爭中失勢，被拔除了在蘋果的實權，最後黯然離開。他形容那是公開的、徹底的失敗。</p>
+      <h3>站起來</h3>
+      <p>他創立 NeXT、投資並帶領 Pixar 做出《玩具總動員》。1997 年蘋果收購 NeXT，他重返蘋果並帶領公司翻身。他後來在史丹佛演講說，被開除是發生在他身上最好的事之一，讓他「重新成為初學者」。</p>
+      <p class="lesson">組織的評價會變、主管會換、權力會重組。你累積的實力，會跟著你走。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>蘇東坡：從朝廷紅人到階下囚</h2></div>
+      <div class="when">北宋 · 1079–1084</div>
+      <h3>谷底</h3>
+      <p>「烏臺詩案」中，他因詩文被指控譏諷朝政，坐牢一百多天，險些喪命。出獄後被貶黃州，掛個小官名卻沒有實權，薪水微薄，只能自己開墾一塊荒地種田，號「東坡居士」。</p>
+      <h3>站起來</h3>
+      <p>正是在黃州，他寫下〈赤壁賦〉、〈念奴嬌·赤壁懷古〉與〈定風波〉。人生最低潮的幾年，成了他文學最高峰的幾年。</p>
+      <p class="lesson">當外在評價暫時無法改變時，還能決定的是：今天我怎麼過、我要累積什麼。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>司馬遷：受辱之後，完成《史記》</h2></div>
+      <div class="when">西漢 · 約西元前 99 年起</div>
+      <h3>谷底</h3>
+      <p>他因替兵敗投降的李陵說了幾句公道話，觸怒漢武帝，被判死罪。為了完成父親託付的史書，他選擇承受當時最屈辱的宮刑而活下來。</p>
+      <h3>站起來</h3>
+      <p>他忍辱寫成《史記》，在〈報任安書〉裡提到：文王、孔子、屈原、孫臏等人，都是在困厄中發憤著述。這部書成了中國史學的典範。</p>
+      <p class="lesson">說真話有時會付出代價。但你心裡那件「一定要完成的事」，是任何評分都拿不走的錨。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>王陽明：被廷杖、被貶到荒山，卻悟出心學</h2></div>
+      <div class="when">明 · 1506–1508</div>
+      <h3>谷底</h3>
+      <p>他上疏得罪權宦劉瑾，被當廷杖打四十，貶到貴州龍場當驛丞——一個偏遠、語言不通、連住處都沒有的地方，途中還傳說遭到追殺。</p>
+      <h3>站起來</h3>
+      <p>在龍場的困境中，他領悟「心即理」，史稱「龍場悟道」，後來發展成影響東亞數百年的陽明心學，自己也在平定寧王之亂中立下大功。</p>
+      <p class="lesson">環境最差的時候，正好是把力氣收回自己身上、想清楚「我到底要什麼」的時候。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>曾國藩：初戰慘敗，羞憤投水</h2></div>
+      <div class="when">清 · 1854</div>
+      <h3>谷底</h3>
+      <p>他辛苦練成的湘軍在靖港之戰大敗，他羞愧到兩度投水尋死，被部下救起，還遭到地方官員的嘲諷與彈劾。</p>
+      <h3>站起來</h3>
+      <p>他檢討戰法、整頓軍紀，「結硬寨，打呆仗」，一步一步扭轉局勢。相傳他把奏摺裡的「屢戰屢敗」改成「屢敗屢戰」——四個字，順序一換，意思完全不同。</p>
+      <p class="lesson">今年的考績是「屢戰屢敗」還是「屢敗屢戰」，取決於你明天選擇怎麼寫下一句。</p>
+    </article>
+
+    <article class="story" data-c="west">
+      <div class="meta"><h2>邱吉爾：被趕下台，坐了十年冷板凳</h2></div>
+      <div class="when">1915 / 1929–1939</div>
+      <h3>谷底</h3>
+      <p>一戰時他主導的加里波利戰役慘敗，被迫辭去海軍大臣，一度跑去前線當營長。1930 年代他又被排除在內閣之外，警告納粹威脅卻被當成危言聳聽，這段時期被稱為他的「荒野歲月」。</p>
+      <h3>站起來</h3>
+      <p>1940 年，當英國最危急的時刻，他被任命為首相，帶領國家撐過二戰最黑暗的一年。</p>
+      <p class="lesson">被冷落的時間不是白費的。持續看清楚、準備好，等到需要你的那一天。</p>
+    </article>
+
+    <article class="story" data-c="west">
+      <div class="meta"><h2>林肯：輸了好幾次選舉的總統</h2></div>
+      <div class="when">1832–1860</div>
+      <h3>谷底</h3>
+      <p>他第一次競選州議員落選，經商失敗欠債多年；後來兩度爭取聯邦參議員都沒成功，1858 年更在全國矚目的辯論後輸給道格拉斯。</p>
+      <h3>站起來</h3>
+      <p>那場落敗的辯論讓全國認識了他。兩年後，1860 年，他當選美國總統。</p>
+      <p class="lesson">一次落選、一次低分，常常是別人第一次真正看見你的時候。</p>
+    </article>
+  </main>
+
+  <section class="toolkit">
+    <h2>拿到考績的那一週，可以做的事</h2>
+    <div class="grid">
+      <div class="tip"><b>先把情緒放 48 小時</b><span>不要當天回信、不要當天決定去留。睡兩晚再說。</span></div>
+      <div class="tip"><b>把評語拆成「事實」與「感受」</b><span>哪些是可以改的具體行為？哪些只是評分制度、配額或政治？</span></div>
+      <div class="tip"><b>找主管談「下一次」</b><span>問：「下個週期要做到什麼，才算超出期待？」把答案寫下來。</span></div>
+      <div class="tip"><b>寫一份自己的成就清單</b><span>不管考績怎麼寫，你解過的 issue、救過的良率、帶過的人，都是真的。</span></div>
+      <div class="tip"><b>照顧身體</b><span>輪班、加班、on-call 已經夠累了。睡眠和運動不是奢侈品。</span></div>
+      <div class="tip"><b>需要時，找人聊聊</b><span>朋友、家人，或公司的員工協助方案（EAP）。台灣也有 1925 安心專線（24 小時）。</span></div>
+    </div>
+  </section>
+
+  <footer>
+    故事依據公開史料與傳記整理；其中標示「相傳」者為流傳較廣但未必有確切史料佐證的說法。<br>
+    願你在被打分數的世界裡，依然記得自己的價值。
+  </footer>
+</div>
+
+<script>
+  const quotes = [
+    ["莫聽穿林打葉聲，何妨吟嘯且徐行。", "蘇軾〈定風波〉，寫於被貶黃州期間"],
+    ["回首向來蕭瑟處，歸去，也無風雨也無晴。", "蘇軾〈定風波〉"],
+    ["屢敗屢戰。", "相傳為曾國藩奏摺用語"],
+    ["蓋文王拘而演周易；仲尼厄而作春秋。", "司馬遷〈報任安書〉"],
+    ["你無法預先把點點滴滴串連起來，只能在回顧時串連。", "賈伯斯，2005 史丹佛畢業演講（意譯）"],
+    ["成功不是終點，失敗也不致命，重要的是繼續前進的勇氣。", "常被歸於邱吉爾的話"],
+    ["山重水複疑無路，柳暗花明又一村。", "陸游〈遊山西村〉"],
+    ["長風破浪會有時，直掛雲帆濟滄海。", "李白〈行路難〉"]
+  ];
+  let qi = 0;
+  document.getElementById("q-btn").addEventListener("click", () => {
+    qi = (qi + 1 + Math.floor(Math.random() * (quotes.length - 1))) % quotes.length;
+    document.getElementById("q-text").textContent = quotes[qi][0];
+    document.getElementById("q-src").textContent = "— " + quotes[qi][1];
+  });
+
+  const btns = document.querySelectorAll("nav.filters button");
+  btns.forEach(b => b.addEventListener("click", () => {
+    btns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    document.querySelectorAll(".story").forEach(s => {
+      s.hidden = b.dataset.f !== "all" && s.dataset.c !== b.dataset.f;
+    });
+  }));
+</script>
+</body>
+</html>
