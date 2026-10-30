@@ -113,6 +113,38 @@
   .tip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
   .tip b { display: block; margin-bottom: 4px; }
   .tip span { color: var(--muted); font-size: .95rem; }
+  section.repair { margin: 56px 0 0; }
+  section.repair h2 { font-family: "Noto Serif TC", serif; font-size: 1.7rem; }
+  section.repair h3 { font-size: 1.1rem; margin: 0 0 4px; }
+  .hint { color: var(--muted); font-size: .92rem; margin: 4px 0; }
+  .calc {
+    background: var(--accent-soft);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin: 20px 0 28px;
+  }
+  .calc-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 12px; }
+  .calc label { display: grid; gap: 4px; font-size: .92rem; color: var(--muted); }
+  .calc input {
+    font: inherit;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    width: 100%;
+  }
+  .calc-out { margin: 14px 0 0; font-weight: 500; }
+  .progress { height: 8px; background: var(--chip); border-radius: 999px; overflow: hidden; }
+  .progress .bar { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+  .weeks { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 16px; }
+  .week { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  .week .tag { display: block; color: var(--muted); font-size: .88rem; margin-bottom: 10px; }
+  .week label { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; font-size: .95rem; cursor: pointer; }
+  .week input { margin-top: 6px; accent-color: var(--accent); flex: none; }
+  .week label:has(input:checked) { color: var(--muted); text-decoration: line-through; }
+  .week a { color: var(--accent); }
+  button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
   footer { color: var(--muted); font-size: .85rem; padding: 32px 0 60px; border-top: 1px solid var(--line); }
 </style>
 </head>
@@ -122,7 +154,7 @@
     <div class="eyebrow">COURAGE · MY LIFE AND WORK</div>
     <h1>考績只是一張表，<br>不是你這個人的定論。</h1>
     <p class="lead">在半導體與科技業，一次考績可能讓人懷疑自己好幾個月。但歷史上許多人，都曾在更低的谷底被「打了很差的分數」——後來卻寫出了最好的作品。下面這幾則真實故事，送給剛拿到考績、需要喘一口氣的你。</p>
-    <p class="lead"><a href="sleep.html" style="color:var(--accent)">🌙 睡不著？聽整夜的睡眠音樂（最長 8 小時） →</a></p>
+    <p class="lead"><a href="#repair" style="color:var(--accent)">🛠 自我修復：30 天計畫 →</a><br><a href="sleep.html" style="color:var(--accent)">🌙 睡不著？聽整夜的睡眠音樂（最長 8 小時） →</a></p>
 
     <div class="quote-box" aria-live="polite">
       <p id="q-text">莫聽穿林打葉聲，何妨吟嘯且徐行。</p>
@@ -693,6 +725,64 @@
     </article>
   </main>
 
+  <section class="repair" id="repair">
+    <h2>自我修復：30 天計畫</h2>
+    <p class="lead">考績影響的是真實的薪水，難過和焦慮都很正常。這份計畫不要求你馬上正面思考，只是把接下來一個月拆成做得到的小步驟。打勾的進度只會存在你這台裝置的瀏覽器裡。</p>
+
+    <div class="calc">
+      <h3>先把損失變成具體數字</h3>
+      <p class="hint">把「考績很差」換成一個實際金額，焦慮就會從模糊變得可以處理。</p>
+      <div class="calc-row">
+        <label>原本預期年收入<input id="c-exp" type="number" inputmode="numeric" min="0" placeholder="例如 1500000"></label>
+        <label>這次實際年收入<input id="c-act" type="number" inputmode="numeric" min="0" placeholder="例如 1300000"></label>
+      </div>
+      <p class="calc-out" id="c-out">輸入兩個數字，看看實際差多少。</p>
+    </div>
+
+    <div class="progress"><div class="bar" id="p-bar"></div></div>
+    <p class="hint" id="p-text">已完成 0 項</p>
+
+    <div class="weeks">
+      <div class="week">
+        <h3>第 1 週：先止血</h3>
+        <span class="tag">讓情緒落地、不做大決定</span>
+        <label><input type="checkbox" data-k="w1a">給自己 48 小時，不回信、不提離職、不在情緒中做決定</label>
+        <label><input type="checkbox" data-k="w1b">用上面的試算，算清楚實際少了多少錢</label>
+        <label><input type="checkbox" data-k="w1c">列出可以暫緩的非必要支出，調整今年預算</label>
+        <label><input type="checkbox" data-k="w1d">連續三晚好好睡覺（可以搭配<a href="sleep.html">睡眠音樂</a>）</label>
+        <label><input type="checkbox" data-k="w1e">跟一個信任的人說說這件事</label>
+      </div>
+      <div class="week">
+        <h3>第 2 週：分開「事實」與「我」</h3>
+        <span class="tag">考績是對一段時間的評分，不是對你這個人</span>
+        <label><input type="checkbox" data-k="w2a">把考績評語逐條寫下，分成「具體可改的行為」和「制度、配額、主觀感受」兩欄</label>
+        <label><input type="checkbox" data-k="w2b">寫一份今年的成就清單：解過的問題、救過的良率、幫過的人</label>
+        <label><input type="checkbox" data-k="w2c">讀三則網頁上的故事，挑一句送給自己</label>
+        <label><input type="checkbox" data-k="w2d">每週至少運動兩次，哪怕只是散步 30 分鐘</label>
+        <label><input type="checkbox" data-k="w2e">如果連續兩週睡不好、提不起勁，預約 EAP 諮商或身心科</label>
+      </div>
+      <div class="week">
+        <h3>第 3 週：拿回主導權</h3>
+        <span class="tag">把下一次考績，變成可以準備的事</span>
+        <label><input type="checkbox" data-k="w3a">約主管一對一，冷靜地問：哪些地方沒達到期待？</label>
+        <label><input type="checkbox" data-k="w3b">再問：下個週期做到什麼，才算「超出期待」？請對方說得越具體越好</label>
+        <label><input type="checkbox" data-k="w3c">把答案寫成一份目標清單，並請主管確認</label>
+        <label><input type="checkbox" data-k="w3d">約好每季回顧一次進度，不要等到年底才知道結果</label>
+        <label><input type="checkbox" data-k="w3e">開始每週花五分鐘記錄成果，留下日期與數字</label>
+      </div>
+      <div class="week">
+        <h3>第 4 週：替自己留後路</h3>
+        <span class="tag">不一定要走，但有選擇會安心很多</span>
+        <label><input type="checkbox" data-k="w4a">誠實評估：這次是「我真的可以進步」，還是「環境、主管、位置不適合」？</label>
+        <label><input type="checkbox" data-k="w4b">更新履歷與 LinkedIn，把成就清單放進去</label>
+        <label><input type="checkbox" data-k="w4c">了解內部轉調的機會，或跟一兩位業界朋友聊聊市場</label>
+        <label><input type="checkbox" data-k="w4d">挑一項能帶著走的技能或證照，排出接下來三個月的學習時間</label>
+        <label><input type="checkbox" data-k="w4e">回頭看第 1 週的自己，寫下一件這個月做得不錯的事</label>
+      </div>
+    </div>
+    <button type="button" id="p-reset" class="ghost">清除打勾</button>
+  </section>
+
   <section class="toolkit">
     <h2>拿到考績的那一週，可以做的事</h2>
     <div class="grid">
@@ -732,6 +822,47 @@
     document.getElementById("q-text").textContent = quotes[qi][0];
     document.getElementById("q-src").textContent = "— " + quotes[qi][1];
   });
+
+  // 30 天計畫：打勾進度只存在這台裝置的瀏覽器
+  const KEY = "repair-30";
+  const boxes = document.querySelectorAll(".week input[type=checkbox]");
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+  const updateProgress = () => {
+    const done = [...boxes].filter(b => b.checked).length;
+    document.getElementById("p-bar").style.width = (done / boxes.length * 100) + "%";
+    document.getElementById("p-text").textContent =
+      done === boxes.length ? `全部 ${done} 項都完成了。你很不簡單。` : `已完成 ${done} / ${boxes.length} 項`;
+  };
+  boxes.forEach(b => {
+    b.checked = !!saved[b.dataset.k];
+    b.addEventListener("change", () => {
+      saved[b.dataset.k] = b.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      updateProgress();
+    });
+  });
+  document.getElementById("p-reset").addEventListener("click", () => {
+    saved = {};
+    boxes.forEach(b => { b.checked = false; });
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    updateProgress();
+  });
+  updateProgress();
+
+  // 薪水差額試算：只在頁面上計算，不會傳到任何地方
+  const fmtNT = n => "NT$ " + Math.round(n).toLocaleString("zh-TW");
+  const calc = () => {
+    const exp = +document.getElementById("c-exp").value;
+    const act = +document.getElementById("c-act").value;
+    const out = document.getElementById("c-out");
+    if (!exp || !act) { out.textContent = "輸入兩個數字，看看實際差多少。"; return; }
+    const diff = exp - act;
+    if (diff <= 0) { out.textContent = "實際收入沒有低於預期。比你擔心的好，對吧？"; return; }
+    out.textContent = `今年少了 ${fmtNT(diff)}（約 ${(diff / exp * 100).toFixed(1)}%），平均每個月約 ${fmtNT(diff / 12)}。` +
+      `這是一個可以規劃的數字，而你還保有 ${(act / exp * 100).toFixed(1)}% 的收入。`;
+  };
+  ["c-exp", "c-act"].forEach(id => document.getElementById(id).addEventListener("input", calc));
 
   const btns = document.querySelectorAll("nav.filters button");
   btns.forEach(b => b.addEventListener("click", () => {
