@@ -15,6 +15,7 @@
   ],
   "shortcuts": [
     { "name": "睡眠音樂", "url": "sleep.html", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "30 天計畫", "url": "./#repair", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "30 天計畫", "url": "./#repair", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "成果記錄器", "url": "./#wins", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

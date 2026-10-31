@@ -1,5 +1,5 @@
 // 離線快取：先用網路取得最新版，失敗時（沒網路）改用快取
-const CACHE = "courage-v1";
+const CACHE = "courage-v2";
 const FILES = [
   "./",
   "index.html",

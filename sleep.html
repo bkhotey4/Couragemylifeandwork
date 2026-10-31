@@ -116,7 +116,14 @@
       <option value="box">呼吸引導：方塊呼吸（4-4-4-4）</option>
       <option value="off">不要呼吸引導</option>
     </select>
+    <select id="story" aria-label="睡前故事">
+      <option value="off" selected>不聽睡前故事</option>
+      <option value="letgo">先聽一則：放下執念</option>
+      <option value="fable">先聽一則：寓言小故事</option>
+      <option value="any">先聽一則：隨機故事</option>
+    </select>
   </div>
+  <div class="hint" id="story-now"></div>
 
   <div class="presets" role="group" aria-label="音景">
     <button type="button" data-p="default" aria-pressed="true">🌙 預設</button>
@@ -512,14 +519,52 @@
     if ("mediaSession" in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({ title: "整夜睡眠音樂", artist: "Courage · My Life and Work" });
     }
+    tellStory();
+  }
+
+  // 睡前故事：從首頁讀取故事，用裝置內建語音慢慢念，音樂同時在背景播放
+  let storyPool = null;
+  const hasSpeech = "speechSynthesis" in window;
+  if (!hasSpeech) $("story").hidden = true;
+  else fetch("index.html").then(r => r.text()).then(html => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    storyPool = [...doc.querySelectorAll(".story")].map(s => ({
+      c: s.dataset.c,
+      title: s.querySelector("h2").textContent,
+      parts: [...s.querySelectorAll("h3, p")].map(e => e.classList.contains("lesson") ? "給今天的你：" + e.textContent : e.textContent)
+    }));
+  }).catch(() => {});
+
+  function tellStory() {
+    const mode = $("story").value;
+    if (!hasSpeech || mode === "off") return;
+    if (!storyPool) { $("story-now").textContent = "故事還沒載入，這次先只播放音樂。"; return; }
+    const pool = mode === "any" ? storyPool : storyPool.filter(s => s.c === mode);
+    const s = pool[Math.floor(Math.random() * pool.length)];
+    const voices = speechSynthesis.getVoices();
+    const voice = voices.find(v => /zh[-_]TW/i.test(v.lang)) || voices.find(v => /^zh/i.test(v.lang));
+    const chunks = [s.title, ...s.parts].flatMap(p => p.split(/(?<=[。！？；])/)).map(x => x.trim()).filter(Boolean);
+    speechSynthesis.cancel();
+    chunks.forEach((c, i) => {
+      const u = new SpeechSynthesisUtterance(c);
+      u.lang = "zh-TW";
+      if (voice) u.voice = voice;
+      u.rate = 0.82;
+      u.volume = 0.85;
+      if (i === chunks.length - 1) u.onend = () => { $("story-now").textContent = ""; };
+      speechSynthesis.speak(u);
+    });
+    $("story-now").textContent = "📖 正在朗讀：" + s.title;
   }
 
   function togglePause() {
-    if (ctx.state === "running") { ctx.suspend(); setPlaying(false, true); }
-    else { ctx.resume(); setPlaying(true); }
+    if (ctx.state === "running") { ctx.suspend(); if (hasSpeech) speechSynthesis.pause(); setPlaying(false, true); }
+    else { ctx.resume(); if (hasSpeech) speechSynthesis.resume(); setPlaying(true); }
   }
 
   function stop(finished) {
+    if (hasSpeech) speechSynthesis.cancel();
+    $("story-now").textContent = "";
     clearInterval(timer);
     if (ctx) ctx.close();
     ctx = null; nodes = null;

@@ -15,6 +15,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+  // 先套用使用者選的主題與字體大小，避免畫面閃一下
+  try {
+    const t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+    const f = localStorage.getItem("font-size");
+    if (f) document.documentElement.style.fontSize = f + "%";
+  } catch (e) {}
+</script>
 <style>
   :root {
     --bg: #f7f4ee;
@@ -176,15 +185,84 @@
   .week a { color: var(--accent); }
   button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
   footer { color: var(--muted); font-size: .85rem; padding: 32px 0 60px; border-top: 1px solid var(--line); }
+  .toolbar { display: flex; justify-content: flex-end; gap: 6px; padding-top: 16px; }
+  .toolbar button { margin: 0; background: var(--chip); color: var(--ink); padding: 4px 12px; font-size: .88rem; }
+  header { padding-top: 32px; }
+  .quick { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; }
+  .quick a {
+    padding: 6px 14px; border-radius: 999px; font-size: .92rem; text-decoration: none;
+    background: var(--surface); border: 1px solid var(--line); color: var(--ink);
+  }
+  .quick a:hover { border-color: var(--accent); color: var(--accent); }
+  .daily { margin-top: 14px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  .daily small { color: var(--muted); display: block; }
+  .daily a { color: var(--ink); font-family: "Noto Serif TC", serif; font-size: 1.15rem; font-weight: 700; text-decoration: none; }
+  .daily a:hover { color: var(--accent); }
+  .daily p { margin: 6px 0 0; color: var(--muted); font-size: .95rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .actions button { margin: 0; background: var(--chip); color: var(--ink); padding: 4px 12px; font-size: .85rem; }
+  .actions button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .story.is-read .when::after { content: " · 讀過"; }
+  section.tool { margin: 56px 0 0; }
+  section.tool h2 { font-family: "Noto Serif TC", serif; font-size: 1.7rem; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin-top: 16px; }
+  .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .panel label { display: grid; gap: 4px; font-size: .92rem; color: var(--muted); }
+  .panel input:not([type=checkbox]), .panel select, .panel textarea {
+    font: inherit; color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; width: 100%;
+  }
+  .panel textarea { resize: vertical; min-height: 84px; }
+  .panel .checks label { display: flex; gap: 8px; align-items: flex-start; color: var(--ink); padding: 3px 0; }
+  .panel .checks input { margin-top: 7px; accent-color: var(--accent); flex: none; }
+  .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .row-btns button { margin: 0; }
+  .wins-list { list-style: none; padding: 0; margin: 10px 0 0; }
+  .wins-list li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+  .wins-list .d { color: var(--muted); font-size: .85rem; flex: none; width: 6.2em; padding-top: 2px; }
+  .wins-list .t { flex: 1; }
+  .wins-list .cat { display: inline-block; background: var(--chip); border-radius: 999px; padding: 0 8px; font-size: .8rem; margin-right: 6px; }
+  .wins-list .num { color: var(--accent); font-weight: 500; }
+  .wins-list button { margin: 0; background: transparent; color: var(--muted); padding: 0 6px; }
+  .script { white-space: pre-wrap; background: var(--accent-soft); border-radius: 12px; padding: 16px 18px; margin-top: 14px; font-size: .95rem; }
+  .moods { display: flex; gap: 8px; flex-wrap: wrap; }
+  .moods button { margin: 0; font-size: 1.6rem; line-height: 1.2; padding: 8px 14px; background: var(--chip); color: var(--ink); border-radius: 14px; }
+  .moods button span { display: block; font-size: .75rem; color: var(--muted); }
+  .moods button[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+  #mood-chart { width: 100%; height: auto; display: block; margin-top: 14px; }
+  dialog.card { border: 0; border-radius: 16px; padding: 16px; background: var(--surface); color: var(--ink); width: min(92vw, 420px); }
+  dialog.card::backdrop { background: rgb(0 0 0 / .55); }
+  dialog.card { overflow: hidden; }
+  dialog.card img { display: block; max-width: 100%; max-height: calc(100vh - 140px); margin: 0 auto; border-radius: 10px; }
+  @media print {
+    body.print-repair {
+      --bg: #fff; --surface: #fff; --ink: #000; --muted: #444; --line: #bbb;
+      --accent: #b5452b; --accent-soft: #f6e4dd; --chip: #eee;
+    }
+    body.print-repair .wrap > :not(#repair) { display: none !important; }
+    body.print-repair #repair button, body.print-repair .calc { display: none; }
+    body.print-repair .week { break-inside: avoid; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="toolbar" role="group" aria-label="閱讀設定">
+    <button type="button" id="fs-down" aria-label="字體縮小">A−</button>
+    <button type="button" id="fs-up" aria-label="字體放大">A＋</button>
+    <button type="button" id="theme-btn">🌓 自動</button>
+  </div>
   <header>
     <div class="eyebrow">COURAGE · MY LIFE AND WORK</div>
     <h1>考績只是一張表，<br>不是你這個人的定論。</h1>
     <p class="lead">在半導體與科技業，一次考績可能讓人懷疑自己好幾個月。但歷史上許多人，都曾在更低的谷底被「打了很差的分數」——後來卻寫出了最好的作品。下面這幾則真實故事，送給剛拿到考績、需要喘一口氣的你。</p>
-    <p class="lead"><a href="#repair" style="color:var(--accent)">🛠 自我修復：30 天計畫 →</a><br><a href="sleep.html" style="color:var(--accent)">🌙 睡不著？聽整夜的睡眠音樂（最長 8 小時） →</a></p>
+    <nav class="quick" aria-label="快速前往">
+      <a href="#repair">🛠 30 天修復計畫</a>
+      <a href="#wins">📝 成果記錄器</a>
+      <a href="#talk">💬 主管面談準備</a>
+      <a href="#mood">🌤 心情紀錄</a>
+      <a href="sleep.html">🌙 睡眠音樂（最長 8 小時）</a>
+    </nav>
     <div class="install" id="install" hidden>
       <b>📱 把這裡加到手機主畫面</b>
       <span id="install-how"></span>
@@ -195,6 +273,11 @@
       <p id="q-text">莫聽穿林打葉聲，何妨吟嘯且徐行。</p>
       <small id="q-src">— 蘇軾〈定風波〉，寫於被貶黃州期間</small>
       <button id="q-btn" type="button">換一句</button>
+    </div>
+    <div class="daily">
+      <small>📅 今天的故事 · 每天換一則</small>
+      <a href="#" id="daily-link"></a>
+      <p id="daily-lesson"></p>
     </div>
   </header>
 
@@ -213,6 +296,8 @@
     <button type="button" data-f="modern" aria-pressed="false">當代人物</button>
     <button type="button" data-f="letgo" aria-pressed="false">放下執念</button>
     <button type="button" data-f="fable" aria-pressed="false">寓言小故事</button>
+    <button type="button" data-f="fav" aria-pressed="false">★ 我的收藏</button>
+    <button type="button" data-f="unread" aria-pressed="false">還沒讀過</button>
   </nav>
 
   <main id="stories">
@@ -1457,11 +1542,11 @@
       <div class="week">
         <h3>第 3 週：拿回主導權</h3>
         <span class="tag">把下一次考績，變成可以準備的事</span>
-        <label><input type="checkbox" data-k="w3a">約主管一對一，冷靜地問：哪些地方沒達到期待？</label>
+        <label><input type="checkbox" data-k="w3a">約主管一對一，冷靜地問：哪些地方沒達到期待？（可以先用<a href="#talk">面談準備</a>寫好講稿）</label>
         <label><input type="checkbox" data-k="w3b">再問：下個週期做到什麼，才算「超出期待」？請對方說得越具體越好</label>
         <label><input type="checkbox" data-k="w3c">把答案寫成一份目標清單，並請主管確認</label>
         <label><input type="checkbox" data-k="w3d">約好每季回顧一次進度，不要等到年底才知道結果</label>
-        <label><input type="checkbox" data-k="w3e">開始每週花五分鐘記錄成果，留下日期與數字</label>
+        <label><input type="checkbox" data-k="w3e">開始每週花五分鐘<a href="#wins">記錄成果</a>，留下日期與數字</label>
       </div>
       <div class="week">
         <h3>第 4 週：替自己留後路</h3>
@@ -1473,7 +1558,90 @@
         <label><input type="checkbox" data-k="w4e">回頭看第 1 週的自己，寫下一件這個月做得不錯的事</label>
       </div>
     </div>
-    <button type="button" id="p-reset" class="ghost">清除打勾</button>
+    <div class="row-btns">
+      <button type="button" id="p-print" class="ghost">🖨 列印／存成 PDF</button>
+      <button type="button" id="p-reset" class="ghost">清除打勾</button>
+    </div>
+  </section>
+
+  <section class="tool" id="wins">
+    <h2>📝 成果記錄器</h2>
+    <p class="lead">每週花一分鐘，記下你做到的事。下一次考績面談，這份清單就是你的證據。資料只存在這台裝置的瀏覽器裡，不會上傳；換手機或清除瀏覽器資料前，記得先匯出。</p>
+    <form class="panel" id="win-form">
+      <div class="form-row">
+        <label>日期<input type="date" id="win-date" required></label>
+        <label>類型
+          <select id="win-cat">
+            <option>解決問題</option>
+            <option>良率／品質</option>
+            <option>效率／成本</option>
+            <option>專案交付</option>
+            <option>幫助同事</option>
+            <option>學習成長</option>
+            <option>其他</option>
+          </select>
+        </label>
+        <label>具體數字（選填）<input id="win-num" placeholder="例如 良率 +1.2%、省 40 小時"></label>
+      </div>
+      <label style="margin-top:12px">做了什麼<textarea id="win-text" required placeholder="例如：找出機台異常的根因，跨部門協調後讓停機時間減半"></textarea></label>
+      <div class="row-btns"><button type="submit">記下來</button></div>
+    </form>
+    <p class="hint" id="win-count"></p>
+    <ul class="wins-list" id="win-list"></ul>
+    <div class="row-btns" id="win-tools">
+      <button type="button" id="win-copy" class="ghost">複製全部</button>
+      <button type="button" id="win-export" class="ghost">匯出成文字檔</button>
+    </div>
+  </section>
+
+  <section class="tool" id="talk">
+    <h2>💬 主管面談準備</h2>
+    <p class="lead">填幾個欄位，產生一份一對一面談稿。重點不是爭論分數，而是把「下一次」談清楚。</p>
+    <div class="panel">
+      <div class="form-row">
+        <label>怎麼稱呼主管（選填）<input id="t-boss" placeholder="例如 Kevin、王經理"></label>
+        <label>這次面談最想得到什麼
+          <select id="t-goal">
+            <option value="next">弄清楚下次怎樣才算超出期待</option>
+            <option value="gap">了解這次沒達到期待的原因</option>
+            <option value="grow">談升遷或調薪的條件</option>
+            <option value="move">探詢內部轉調的可能</option>
+          </select>
+        </label>
+      </div>
+      <label style="margin-top:12px">今年最有把握的成果（一行一項）<textarea id="t-wins" placeholder="例如：主導新機台導入，比預定提前兩週量產"></textarea></label>
+      <div class="row-btns"><button type="button" id="t-fill" class="ghost">從成果記錄器帶入</button></div>
+      <div class="checks" style="margin-top:12px">
+        <span class="hint">想問的問題（可複選）</span>
+        <label><input type="checkbox" checked value="具體來說，有哪些地方沒有達到你的期待？可以舉一兩個例子嗎？">沒達到期待的具體例子</label>
+        <label><input type="checkbox" checked value="下一個週期，我要做到什麼程度才算超出期待？能不能用可以衡量的方式說？">超出期待的標準</label>
+        <label><input type="checkbox" value="這次的結果，有多少是我的表現，有多少是部門配額或排序的關係？">配額與排序的影響</label>
+        <label><input type="checkbox" checked value="你覺得我最該優先加強的一項能力是什麼？">最該加強的能力</label>
+        <label><input type="checkbox" value="有沒有哪些專案或角色，能讓我更有機會做出被看見的成果？">爭取更被看見的專案</label>
+        <label><input type="checkbox" checked value="我們可以每季花 30 分鐘回顧一次進度嗎？這樣我不用等到年底才知道結果。">約好每季回顧</label>
+      </div>
+      <div class="row-btns">
+        <button type="button" id="t-make">產生面談稿</button>
+        <button type="button" id="t-copy" class="ghost" hidden>複製面談稿</button>
+      </div>
+      <div class="script" id="t-out" hidden></div>
+    </div>
+  </section>
+
+  <section class="tool" id="mood">
+    <h2>🌤 心情紀錄</h2>
+    <p class="lead">每天點一下，記錄今天的心情。好轉通常很慢，要看曲線才會發現，自己其實一直在往前走。資料只存在這台裝置。</p>
+    <div class="panel">
+      <div class="moods" id="moods" role="group" aria-label="今天的心情">
+        <button type="button" data-v="1" aria-pressed="false">😞<span>很糟</span></button>
+        <button type="button" data-v="2" aria-pressed="false">🙁<span>不太好</span></button>
+        <button type="button" data-v="3" aria-pressed="false">😐<span>普通</span></button>
+        <button type="button" data-v="4" aria-pressed="false">🙂<span>還不錯</span></button>
+        <button type="button" data-v="5" aria-pressed="false">😄<span>很好</span></button>
+      </div>
+      <p class="hint" id="mood-text"></p>
+      <svg id="mood-chart" viewBox="0 0 600 190" role="img" aria-label="最近 30 天的心情曲線"></svg>
+    </div>
   </section>
 
   <section class="toolkit">
@@ -1493,6 +1661,15 @@
     願你在被打分數的世界裡，依然記得自己的價值。
   </footer>
 </div>
+
+<dialog class="card" id="card-dlg">
+  <img id="card-img" alt="故事金句卡片">
+  <div class="row-btns">
+    <button type="button" id="card-share" hidden>分享</button>
+    <button type="button" id="card-save">存成圖片</button>
+    <button type="button" id="card-close" class="ghost">關閉</button>
+  </div>
+</dialog>
 
 <script>
   const quotes = [
@@ -1584,22 +1761,106 @@
   };
   ["c-exp", "c-act"].forEach(id => document.getElementById(id).addEventListener("input", calc));
 
-  // 分類篩選與關鍵字搜尋會同時生效
+  const $ = id => document.getElementById(id);
+  const load = (k, fallback) => { try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch (e) { return fallback; } };
+  const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const dateKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
+  const flash = (btn, text) => {
+    const old = btn.dataset.label || (btn.dataset.label = btn.textContent);
+    btn.textContent = text;
+    setTimeout(() => { btn.textContent = old; }, 2000);
+  };
+  const copyText = async (btn, text) => {
+    try { await navigator.clipboard.writeText(text); flash(btn, "已複製 ✓"); }
+    catch (e) { flash(btn, "無法複製，請手動選取"); }
+  };
+  const download = (blob, name) => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
+  // 字體大小與深淺色：存在這台裝置
+  const SIZES = [90, 100, 112, 125, 140];
+  let fs = +(load("font-size", 100));
+  const setFs = v => {
+    fs = v;
+    document.documentElement.style.fontSize = v + "%";
+    store("font-size", v);
+  };
+  $("fs-down").addEventListener("click", () => setFs(SIZES[Math.max(0, SIZES.indexOf(fs) - 1)] || 100));
+  $("fs-up").addEventListener("click", () => setFs(SIZES[Math.min(SIZES.length - 1, SIZES.indexOf(fs) + 1)] || 100));
+  const THEMES = { "": "🌓 自動", light: "☀️ 淺色", dark: "🌙 深色" };
+  const themeBtn = $("theme-btn");
+  const paintTheme = () => { themeBtn.textContent = THEMES[document.documentElement.dataset.theme || ""]; };
+  themeBtn.addEventListener("click", () => {
+    const order = Object.keys(THEMES);
+    const next = order[(order.indexOf(document.documentElement.dataset.theme || "") + 1) % order.length];
+    if (next) document.documentElement.dataset.theme = next;
+    else delete document.documentElement.dataset.theme;
+    try { next ? localStorage.setItem("theme", next) : localStorage.removeItem("theme"); } catch (e) {}
+    paintTheme();
+  });
+  paintTheme();
+
+  // 收藏與讀過：以故事標題當作識別
   const stories = [...document.querySelectorAll(".story")];
+  const titleOf = s => s.querySelector("h2").textContent;
+  const textOf = new Map(stories.map(s => [s, s.textContent.toLowerCase()]));
+  const favs = new Set(load("story-fav", []));
+  const reads = new Set(load("story-read", []));
+  const paintStory = s => {
+    const t = titleOf(s);
+    const fav = s.querySelector('[data-a="fav"]');
+    const read = s.querySelector('[data-a="read"]');
+    fav.textContent = favs.has(t) ? "★ 已收藏" : "☆ 收藏";
+    fav.setAttribute("aria-pressed", favs.has(t));
+    read.textContent = reads.has(t) ? "✓ 讀過" : "標記讀過";
+    read.setAttribute("aria-pressed", reads.has(t));
+    s.classList.toggle("is-read", reads.has(t));
+  };
+  const canSpeak = "speechSynthesis" in window;
+  stories.forEach((s, i) => {
+    s.id = "s" + (i + 1);
+    const bar = document.createElement("div");
+    bar.className = "actions";
+    bar.innerHTML =
+      '<button type="button" data-a="fav"></button>' +
+      '<button type="button" data-a="read"></button>' +
+      (canSpeak ? '<button type="button" data-a="speak" aria-pressed="false">🔊 朗讀</button>' : "") +
+      '<button type="button" data-a="card">🖼 分享卡片</button>';
+    s.append(bar);
+    paintStory(s);
+  });
+
+  // 分類篩選與關鍵字搜尋會同時生效
   const btns = document.querySelectorAll("nav.filters button");
   const search = document.getElementById("search");
   let filter = "all";
+  const inFilter = s => {
+    switch (filter) {
+      case "all": return true;
+      case "tw": return s.hasAttribute("data-tw");
+      case "fav": return favs.has(titleOf(s));
+      case "unread": return !reads.has(titleOf(s));
+      default: return s.dataset.c === filter;
+    }
+  };
   const applyFilters = () => {
     const words = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
     let shown = 0;
     stories.forEach(s => {
-      const inCat = filter === "all" || (filter === "tw" ? s.hasAttribute("data-tw") : s.dataset.c === filter);
-      const text = s.textContent.toLowerCase();
-      s.hidden = !(inCat && words.every(w => text.includes(w)));
+      const text = textOf.get(s);
+      s.hidden = !(inFilter(s) && words.every(w => text.includes(w)));
       if (!s.hidden) shown++;
     });
+    const readCount = stories.filter(s => reads.has(titleOf(s))).length;
+    const empty = filter === "fav" && !favs.size ? "還沒有收藏。看到喜歡的故事，按「☆ 收藏」就會出現在這裡。" : "找不到符合的故事，換個關鍵字試試。";
     document.getElementById("count").textContent =
-      shown ? `顯示 ${shown} / ${stories.length} 則故事` : "找不到符合的故事，換個關鍵字試試。";
+      shown ? `顯示 ${shown} / ${stories.length} 則故事 · 已讀 ${readCount} 則` : empty;
   };
   btns.forEach(b => b.addEventListener("click", () => {
     btns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
@@ -1622,6 +1883,299 @@
     pick.classList.add("picked");
     pick.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+
+  // 每日一則：同一天打開都是同一則，隔天自動換
+  const dayNo = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+  const daily = stories[(dayNo * 37) % stories.length];
+  $("daily-link").textContent = titleOf(daily);
+  $("daily-link").href = "#" + daily.id;
+  $("daily-lesson").textContent = daily.querySelector(".lesson").textContent;
+  $("daily-link").addEventListener("click", e => {
+    e.preventDefault();
+    daily.hidden = false;
+    stories.forEach(s => s.classList.remove("picked"));
+    daily.classList.add("picked");
+    daily.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // 朗讀：用裝置內建的中文語音，分句排隊念，避免長句被瀏覽器中斷
+  let speaking = null;
+  const setSpeak = (s, on) => {
+    const b = s.querySelector('[data-a="speak"]');
+    b.textContent = on ? "⏹ 停止朗讀" : "🔊 朗讀";
+    b.setAttribute("aria-pressed", on);
+  };
+  const speakStory = s => {
+    const synth = speechSynthesis;
+    const wasMe = speaking === s;
+    synth.cancel();
+    if (speaking) setSpeak(speaking, false);
+    speaking = null;
+    if (wasMe) return;
+    const parts = [titleOf(s), ...[...s.querySelectorAll("h3, p")].map(e =>
+      e.classList.contains("lesson") ? "給今天的你：" + e.textContent : e.textContent)];
+    const chunks = parts.flatMap(p => p.split(/(?<=[。！？；])/)).map(x => x.trim()).filter(Boolean);
+    const voices = synth.getVoices();
+    const voice = voices.find(v => /zh[-_]TW/i.test(v.lang)) || voices.find(v => /^zh/i.test(v.lang));
+    chunks.forEach((c, i) => {
+      const u = new SpeechSynthesisUtterance(c);
+      u.lang = "zh-TW";
+      if (voice) u.voice = voice;
+      u.rate = 0.95;
+      if (i === chunks.length - 1) u.onend = () => { if (speaking === s) { speaking = null; setSpeak(s, false); } };
+      synth.speak(u);
+    });
+    speaking = s;
+    setSpeak(s, true);
+  };
+
+  // 分享卡片：把標題和「給今天的你」畫成一張圖
+  const wrapLines = (ctx, text, maxW) => {
+    const lines = [];
+    let line = "";
+    for (const ch of text) {
+      // 標點不放在行首，讓它留在上一行的尾巴
+      if (line && ctx.measureText(line + ch).width > maxW && !"，。、！？；：」』）…".includes(ch)) { lines.push(line); line = ch.trim(); }
+      else line += ch;
+    }
+    if (line) lines.push(line);
+    return lines;
+  };
+  let cardBlob = null, cardName = "";
+  const makeCard = async s => {
+    const W = 1080, H = 1350, pad = 96;
+    const c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    const ctx = c.getContext("2d");
+    try {
+      await Promise.all([
+        document.fonts.load('700 64px "Noto Serif TC"'),
+        document.fonts.load('500 44px "Noto Serif TC"'),
+        document.fonts.load('400 32px "Noto Sans TC"')
+      ]);
+    } catch (e) {}
+    const serif = '"Noto Serif TC", "PingFang TC", "Microsoft JhengHei", serif';
+    const sans = '"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+    ctx.fillStyle = "#f7f4ee"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#f6e4dd";
+    ctx.beginPath(); ctx.arc(W - 140, H, 300, Math.PI, 2 * Math.PI); ctx.fill();
+    ctx.fillStyle = "#b5452b"; ctx.fillRect(0, 0, W, 18);
+    ctx.textBaseline = "alphabetic";
+    ctx.font = `700 30px ${sans}`;
+    ctx.fillText("考績之後，再站起來", pad, 150);
+    ctx.fillStyle = "#1f2328";
+    ctx.font = `700 72px ${serif}`;
+    let y = 280;
+    for (const l of wrapLines(ctx, titleOf(s), W - 2 * pad)) { ctx.fillText(l, pad, y); y += 102; }
+    ctx.fillStyle = "#5d6470";
+    ctx.font = `400 32px ${sans}`;
+    ctx.fillText(s.querySelector(".when").textContent, pad, y);
+    y += 110;
+    ctx.fillStyle = "#b5452b";
+    ctx.font = `700 34px ${sans}`;
+    ctx.fillText("給今天的你", pad + 40, y);
+    y += 74;
+    const lesson = s.querySelector(".lesson").textContent;
+    let size = 54;
+    let lines;
+    do {
+      ctx.font = `500 ${size}px ${serif}`;
+      lines = wrapLines(ctx, lesson, W - 2 * pad - 40);
+      size -= 2;
+    } while (y + lines.length * size * 1.7 > H - 200 && size > 30);
+    const lh = (size + 2) * 1.7;
+    ctx.fillStyle = "#b5452b";
+    ctx.fillRect(pad, y - 120, 8, lines.length * lh + 110);
+    ctx.fillStyle = "#1f2328";
+    for (const l of lines) { ctx.fillText(l, pad + 40, y); y += lh; }
+    ctx.fillStyle = "#5d6470";
+    ctx.font = `400 28px ${sans}`;
+    ctx.fillText(location.host + location.pathname.replace(/index\.html$/, ""), pad, H - 90);
+    cardBlob = await new Promise(r => c.toBlob(r, "image/png"));
+    cardName = `再站起來-${s.id}.png`;
+    $("card-img").src = URL.createObjectURL(cardBlob);
+    const file = new File([cardBlob], cardName, { type: "image/png" });
+    $("card-share").hidden = !(navigator.canShare && navigator.canShare({ files: [file] }));
+    $("card-dlg").showModal();
+  };
+  $("card-save").addEventListener("click", () => download(cardBlob, cardName));
+  $("card-share").addEventListener("click", async () => {
+    try { await navigator.share({ files: [new File([cardBlob], cardName, { type: "image/png" })] }); } catch (e) {}
+  });
+  $("card-close").addEventListener("click", () => $("card-dlg").close());
+  $("card-dlg").addEventListener("close", () => URL.revokeObjectURL($("card-img").src));
+
+  document.getElementById("stories").addEventListener("click", e => {
+    const b = e.target.closest(".actions button");
+    if (!b) return;
+    const s = b.closest(".story");
+    const t = titleOf(s);
+    if (b.dataset.a === "fav" || b.dataset.a === "read") {
+      const set = b.dataset.a === "fav" ? favs : reads;
+      set.has(t) ? set.delete(t) : set.add(t);
+      store(b.dataset.a === "fav" ? "story-fav" : "story-read", [...set]);
+      paintStory(s);
+      if (b.dataset.a === "read") applyFilters();
+    } else if (b.dataset.a === "speak") {
+      speakStory(s);
+    } else if (b.dataset.a === "card") {
+      makeCard(s);
+    }
+  });
+
+  // 成果記錄器
+  let wins = load("wins-log", []);
+  $("win-date").value = dateKey(new Date());
+  const winLine = w => `${w.date}［${w.cat}］${w.text}${w.num ? `（${w.num}）` : ""}`;
+  const sortedWins = () => [...wins].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+  const renderWins = () => {
+    const list = $("win-list");
+    list.replaceChildren();
+    for (const w of sortedWins()) {
+      const li = document.createElement("li");
+      const d = document.createElement("span"); d.className = "d"; d.textContent = w.date;
+      const t = document.createElement("span"); t.className = "t";
+      const cat = document.createElement("span"); cat.className = "cat"; cat.textContent = w.cat;
+      t.append(cat, w.text);
+      if (w.num) { const n = document.createElement("span"); n.className = "num"; n.textContent = "（" + w.num + "）"; t.append(n); }
+      const del = document.createElement("button");
+      del.type = "button"; del.textContent = "✕"; del.title = "刪除這筆"; del.dataset.id = w.id;
+      li.append(d, t, del);
+      list.append(li);
+    }
+    const weekAgo = dateKey(daysAgo(6));
+    const recent = wins.filter(w => w.date >= weekAgo).length;
+    $("win-count").textContent = wins.length
+      ? `共 ${wins.length} 筆成果，最近 7 天記了 ${recent} 筆。`
+      : "還沒有紀錄。從今天做到的一件小事開始吧。";
+    $("win-tools").hidden = !wins.length;
+  };
+  $("win-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const text = $("win-text").value.trim();
+    if (!text) return;
+    wins.push({ id: Date.now(), date: $("win-date").value || dateKey(new Date()), cat: $("win-cat").value, num: $("win-num").value.trim(), text });
+    store("wins-log", wins);
+    $("win-text").value = "";
+    $("win-num").value = "";
+    renderWins();
+  });
+  $("win-list").addEventListener("click", e => {
+    const b = e.target.closest("button[data-id]");
+    if (!b || !confirm("刪除這筆紀錄？")) return;
+    wins = wins.filter(w => String(w.id) !== b.dataset.id);
+    store("wins-log", wins);
+    renderWins();
+  });
+  const winsText = () => `我的成果紀錄（${dateKey(new Date())} 匯出）\n\n` + sortedWins().reverse().map(winLine).join("\n") + "\n";
+  $("win-copy").addEventListener("click", e => copyText(e.currentTarget, winsText()));
+  $("win-export").addEventListener("click", () =>
+    download(new Blob([winsText()], { type: "text/plain;charset=utf-8" }), `成果紀錄-${dateKey(new Date())}.txt`));
+  renderWins();
+
+  // 主管面談準備
+  const GOALS = {
+    next: "弄清楚下一個週期要做到什麼，才算超出期待",
+    gap: "了解這次沒有達到期待的原因",
+    grow: "了解升遷或調薪需要具備哪些條件",
+    move: "聊聊我在公司裡還有哪些發展的可能"
+  };
+  const GOAL_Q = {
+    grow: "以我目前的狀況，距離下一個職級還差哪些條件？",
+    move: "如果我想嘗試其他部門或角色，你會建議我怎麼準備？"
+  };
+  $("t-fill").addEventListener("click", e => {
+    if (!wins.length) { flash(e.currentTarget, "成果記錄器還沒有資料"); return; }
+    $("t-wins").value = sortedWins().slice(0, 8).map(w => w.text + (w.num ? `（${w.num}）` : "")).join("\n");
+  });
+  $("t-make").addEventListener("click", () => {
+    const boss = $("t-boss").value.trim();
+    const goal = $("t-goal").value;
+    const winsList = $("t-wins").value.split("\n").map(x => x.trim()).filter(Boolean);
+    const qs = [GOAL_Q[goal], ...[...document.querySelectorAll("#talk .checks input:checked")].map(c => c.value)].filter(Boolean);
+    const num = (arr, empty) => arr.length ? arr.map((x, i) => `${i + 1}. ${x}`).join("\n") : empty;
+    $("t-out").textContent =
+`【開場】
+${boss ? boss + "，" : ""}謝謝你撥時間。這次考績的結果我有些意外，也花了幾天消化。今天不是想爭論分數，而是想${GOALS[goal]}，讓我們接下來的方向一致。
+
+【我這一年做到的事】
+${num(winsList, "（還沒填。可以先到上面的成果記錄器整理。）")}
+如果有些部分你之前沒有機會看到，我想補充給你參考。
+
+【我想請教的問題】
+${num(qs, "（請勾選至少一個問題）")}
+
+【收尾】
+我會把今天談到的重點整理成幾項具體目標，寄給你確認。之後我們每季看一次進度，好嗎？
+
+【提醒自己】
+・語氣平穩，先聽完再回應，不急著辯解。
+・把主管的回答寫下來，越具體越好。
+・不在面談當下決定去留。`;
+    $("t-out").hidden = false;
+    $("t-copy").hidden = false;
+  });
+  $("t-copy").addEventListener("click", e => copyText(e.currentTarget, $("t-out").textContent));
+
+  // 心情紀錄與 30 天曲線
+  const MOODS = ["", "😞", "🙁", "😐", "🙂", "😄"];
+  const MOOD_WORDS = ["", "很糟", "不太好", "普通", "還不錯", "很好"];
+  const moods = load("mood-log", {});
+  const avgOf = (from, to) => {
+    const v = [];
+    for (let i = from; i <= to; i++) { const m = moods[dateKey(daysAgo(i))]; if (m) v.push(m); }
+    return v.length ? { avg: v.reduce((a, b) => a + b) / v.length, n: v.length } : null;
+  };
+  const renderMood = () => {
+    const today = moods[dateKey(new Date())];
+    document.querySelectorAll("#moods button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.v === today));
+    const last = avgOf(0, 6), prev = avgOf(7, 13);
+    let msg = today ? `今天記錄了：${MOODS[today]} ${MOOD_WORDS[today]}。` : "今天還沒記錄。點一個最接近的就好。";
+    if (last && prev) {
+      const d = last.avg - prev.avg;
+      msg += d > 0.2 ? " 最近 7 天比前一週好一些，你正在往前走。" : d < -0.2 ? " 最近 7 天比前一週低一點，對自己溫柔一點。" : " 最近兩週差不多，穩住就很好。";
+    }
+    if (last && last.n >= 4 && last.avg <= 2) {
+      msg += " 這陣子心情一直很低，這不是你不夠堅強。找人聊聊會有幫助：1925 安心專線 24 小時都在，也可以預約公司的 EAP 諮商。";
+    }
+    $("mood-text").textContent = msg;
+
+    const W = 600, H = 190, L = 40, R = 12, T = 14, B = 34;
+    const x = i => L + i * (W - L - R) / 29;
+    const y = v => T + (5 - v) * (H - T - B) / 4;
+    let svg = "";
+    for (let v = 1; v <= 5; v++) {
+      svg += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)"/>`;
+      svg += `<text x="6" y="${y(v) + 6}" font-size="16">${MOODS[v]}</text>`;
+    }
+    const pts = [];
+    for (let i = 0; i < 30; i++) {
+      const m = moods[dateKey(daysAgo(29 - i))];
+      if (m) pts.push([x(i), y(m)]);
+    }
+    [0, 15, 29].forEach(i => {
+      const d = daysAgo(29 - i);
+      const anchor = i === 0 ? "start" : i === 29 ? "end" : "middle";
+      svg += `<text x="${x(i)}" y="${H - 8}" font-size="13" text-anchor="${anchor}" style="fill:var(--muted)">${i === 29 ? "今天" : `${d.getMonth() + 1}/${d.getDate()}`}</text>`;
+    });
+    if (pts.length > 1) svg += `<polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" style="stroke:var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>`;
+    pts.forEach(p => { svg += `<circle cx="${p[0]}" cy="${p[1]}" r="4.5" style="fill:var(--accent)"/>`; });
+    if (!pts.length) svg += `<text x="${(L + W - R) / 2}" y="${H / 2}" text-anchor="middle" font-size="15" style="fill:var(--muted)">記錄幾天之後，這裡會出現你的心情曲線</text>`;
+    $("mood-chart").innerHTML = svg;
+  };
+  document.querySelectorAll("#moods button").forEach(b => b.addEventListener("click", () => {
+    moods[dateKey(new Date())] = +b.dataset.v;
+    store("mood-log", moods);
+    renderMood();
+  }));
+  renderMood();
+
+  // 只列印 30 天計畫
+  $("p-print").addEventListener("click", () => {
+    document.body.classList.add("print-repair");
+    window.print();
+  });
+  window.addEventListener("afterprint", () => document.body.classList.remove("print-repair"));
 </script>
 <script>
   if ("serviceWorker" in navigator && location.protocol === "https:") {
