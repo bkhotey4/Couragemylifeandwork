@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>考績之後，再站起來</title>
-<meta name="description" content="給被考績打擊的科技人：一百二十則故事，關於跌倒後怎麼站起來，以及怎麼放下。">
+<meta name="description" content="給被考績打擊的科技人：上百則故事，關於跌倒後怎麼站起來，以及怎麼放下。">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#b5452b">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -19,9 +19,9 @@
   // 先套用使用者選的主題與字體大小，避免畫面閃一下
   try {
     const t = localStorage.getItem("theme");
-    if (t) document.documentElement.dataset.theme = t;
-    const f = localStorage.getItem("font-size");
-    if (f) document.documentElement.style.fontSize = f + "%";
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    const f = +localStorage.getItem("font-size");
+    if (f >= 80 && f <= 160) document.documentElement.style.fontSize = f + "%";
   } catch (e) {}
 </script>
 <style>
@@ -273,7 +273,7 @@
       <a href="#talk">💬 主管面談準備</a>
       <a href="#mood">🌤 心情紀錄</a>
       <a href="#books">📚 推薦書單</a>
-      <a href="sleep.html">🌙 睡眠音樂（最長 8 小時）</a>
+      <a href="sleep.html">🌙 睡眠音樂（可整夜播放）</a>
     </nav>
     <div class="install" id="install" hidden>
       <b>📱 把這裡加到手機主畫面</b>
@@ -1855,18 +1855,32 @@
     ["塞翁失馬，焉知非福。", "典出《淮南子》"],
     ["讓我們困擾的不是事情本身，而是我們對事情的看法。", "愛比克泰德（意譯）"]
   ];
+  const $ = id => document.getElementById(id);
+  // 讀取本機資料時檢查格式，資料壞掉就用預設值，不讓整頁的功能跟著失效
+  const isObj = v => v !== null && typeof v === "object" && !Array.isArray(v);
+  const load = (k, fallback, valid) => {
+    try {
+      const v = JSON.parse(localStorage.getItem(k));
+      return v !== null && valid(v) ? v : fallback;
+    } catch (e) { return fallback; }
+  };
+  const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
   let qi = 0;
-  document.getElementById("q-btn").addEventListener("click", () => {
+  const showQuote = () => {
+    $("q-text").textContent = quotes[qi][0];
+    $("q-src").textContent = "— " + quotes[qi][1];
+  };
+  $("q-btn").addEventListener("click", () => {
     qi = (qi + 1 + Math.floor(Math.random() * (quotes.length - 1))) % quotes.length;
-    document.getElementById("q-text").textContent = quotes[qi][0];
-    document.getElementById("q-src").textContent = "— " + quotes[qi][1];
+    showQuote();
   });
+  showQuote();
 
   // 30 天計畫：打勾進度只存在這台裝置的瀏覽器
   const KEY = "repair-30";
   const boxes = document.querySelectorAll(".week input[type=checkbox]");
-  let saved = {};
-  try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+  let saved = load(KEY, {}, isObj);
   const updateProgress = () => {
     const done = [...boxes].filter(b => b.checked).length;
     document.getElementById("p-bar").style.width = (done / boxes.length * 100) + "%";
@@ -1877,7 +1891,7 @@
     b.checked = !!saved[b.dataset.k];
     b.addEventListener("change", () => {
       saved[b.dataset.k] = b.checked;
-      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      store(KEY, saved);
       updateProgress();
     });
   });
@@ -1922,7 +1936,10 @@
     const exp = +document.getElementById("c-exp").value;
     const act = +document.getElementById("c-act").value;
     const out = document.getElementById("c-out");
-    if (!exp || !act) { out.textContent = "輸入兩個數字，看看實際差多少。"; return; }
+    if (!(exp > 0) || !(act > 0)) {
+      out.textContent = "輸入兩個數字（大於 0），看看實際差多少。";
+      return;
+    }
     const diff = exp - act;
     if (diff <= 0) { out.textContent = "實際收入沒有低於預期。比你擔心的好，對吧？"; return; }
     out.textContent = `今年少了 ${fmtNT(diff)}（約 ${(diff / exp * 100).toFixed(1)}%），平均每個月約 ${fmtNT(diff / 12)}。` +
@@ -1930,9 +1947,6 @@
   };
   ["c-exp", "c-act"].forEach(id => document.getElementById(id).addEventListener("input", calc));
 
-  const $ = id => document.getElementById(id);
-  const load = (k, fallback) => { try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch (e) { return fallback; } };
-  const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
   const dateKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
   const flash = (btn, text) => {
@@ -1954,7 +1968,9 @@
 
   // 字體大小與深淺色：存在這台裝置
   const SIZES = [90, 100, 112, 125, 140];
-  let fs = +(load("font-size", 100));
+  // 存的值不在清單裡時，取最接近的一級，A+／A− 才會往正確方向走
+  const savedFs = load("font-size", 100, v => typeof v === "number");
+  let fs = SIZES.reduce((a, b) => Math.abs(b - savedFs) < Math.abs(a - savedFs) ? b : a);
   const setFs = v => {
     fs = v;
     document.documentElement.style.fontSize = v + "%";
@@ -1979,8 +1995,8 @@
   const stories = [...document.querySelectorAll(".story")];
   const titleOf = s => s.querySelector("h2").textContent;
   const textOf = new Map(stories.map(s => [s, s.textContent.toLowerCase()]));
-  const favs = new Set(load("story-fav", []));
-  const reads = new Set(load("story-read", []));
+  const favs = new Set(load("story-fav", [], Array.isArray));
+  const reads = new Set(load("story-read", [], Array.isArray));
   const paintStory = s => {
     const t = titleOf(s);
     const fav = s.querySelector('[data-a="fav"]');
@@ -2031,13 +2047,22 @@
     document.getElementById("count").textContent =
       shown ? `顯示 ${shown} / ${stories.length} 則故事 · 已讀 ${readCount} 則` : empty;
   };
-  btns.forEach(b => b.addEventListener("click", () => {
-    btns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
-    filter = b.dataset.f;
+  const setFilter = f => {
+    filter = f;
+    btns.forEach(x => x.setAttribute("aria-pressed", x.dataset.f === f ? "true" : "false"));
     applyFilters();
-  }));
+  };
+  btns.forEach(b => b.addEventListener("click", () => setFilter(b.dataset.f)));
   search.addEventListener("input", applyFilters);
   applyFilters();
+
+  // 跳到某一則故事；如果它被篩選藏起來，先清掉篩選，讓畫面和計數一致
+  const showStory = s => {
+    if (s.hidden) { search.value = ""; setFilter("all"); }
+    stories.forEach(x => x.classList.remove("picked"));
+    s.classList.add("picked");
+    s.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // 從目前可見的故事裡隨機抽一則，並避免連續抽到同一則
   let lastPick = null;
@@ -2047,24 +2072,22 @@
     if (pool.length > 1) pool = pool.filter(s => s !== lastPick);
     const pick = pool[Math.floor(Math.random() * pool.length)];
     lastPick = pick;
-    pick.hidden = false;
-    stories.forEach(s => s.classList.remove("picked"));
-    pick.classList.add("picked");
-    pick.scrollIntoView({ behavior: "smooth", block: "start" });
+    showStory(pick);
   });
 
-  // 每日一則：同一天打開都是同一則，隔天自動換
+  // 每日一則：同一天打開都是同一則，隔天自動換。
+  // 每天跳一個和故事總數互質的步長：故事增減後仍會輪過每一則，也不會照網頁順序連著同一類
+  const gcd = (a, b) => b ? gcd(b, a % b) : a;
+  let step = Math.max(1, Math.round(stories.length * 0.38));
+  while (gcd(step, stories.length) !== 1) step++;
   const dayNo = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
-  const daily = stories[(dayNo * 37) % stories.length];
+  const daily = stories[(dayNo * step) % stories.length];
   $("daily-link").textContent = titleOf(daily);
   $("daily-link").href = "#" + daily.id;
   $("daily-lesson").textContent = daily.querySelector(".lesson").textContent;
   $("daily-link").addEventListener("click", e => {
     e.preventDefault();
-    daily.hidden = false;
-    stories.forEach(s => s.classList.remove("picked"));
-    daily.classList.add("picked");
-    daily.scrollIntoView({ behavior: "smooth", block: "start" });
+    showStory(daily);
   });
 
   // 朗讀：用裝置內建的中文語音，分句排隊念，避免長句被瀏覽器中斷
@@ -2091,7 +2114,8 @@
       u.lang = "zh-TW";
       if (voice) u.voice = voice;
       u.rate = 0.95;
-      if (i === chunks.length - 1) u.onend = () => { if (speaking === s) { speaking = null; setSpeak(s, false); } };
+      // 念完或出錯（例如裝置沒有中文語音）都要把按鈕還原
+      if (i === chunks.length - 1) u.onend = u.onerror = () => { if (speaking === s) { speaking = null; setSpeak(s, false); } };
       synth.speak(u);
     });
     speaking = s;
@@ -2161,6 +2185,7 @@
     ctx.font = `400 28px ${sans}`;
     ctx.fillText(location.host + location.pathname.replace(/index\.html$/, ""), pad, H - 90);
     cardBlob = await new Promise(r => c.toBlob(r, "image/png"));
+    if (!cardBlob) return;
     cardName = `再站起來-${s.id}.png`;
     $("card-img").src = URL.createObjectURL(cardBlob);
     const file = new File([cardBlob], cardName, { type: "image/png" });
@@ -2193,7 +2218,8 @@
   });
 
   // 成果記錄器
-  let wins = load("wins-log", []);
+  const isWin = w => isObj(w) && typeof w.text === "string" && /^\d{4}-\d{2}-\d{2}$/.test(w.date);
+  let wins = load("wins-log", [], Array.isArray).filter(isWin);
   $("win-date").value = dateKey(new Date());
   const winLine = w => `${w.date}［${w.cat}］${w.text}${w.num ? `（${w.num}）` : ""}`;
   const sortedWins = () => [...wins].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
@@ -2223,7 +2249,9 @@
     e.preventDefault();
     const text = $("win-text").value.trim();
     if (!text) return;
-    wins.push({ id: Date.now(), date: $("win-date").value || dateKey(new Date()), cat: $("win-cat").value, num: $("win-num").value.trim(), text });
+    // 連按兩次也不會產生重複的 id，否則刪除一筆會連帶刪掉另一筆
+    const id = Math.max(Date.now(), ...wins.map(w => +w.id + 1 || 0));
+    wins.push({ id, date: $("win-date").value || dateKey(new Date()), cat: $("win-cat").value, num: $("win-num").value.trim(), text });
     store("wins-log", wins);
     $("win-text").value = "";
     $("win-num").value = "";
@@ -2289,14 +2317,16 @@ ${num(qs, "（請勾選至少一個問題）")}
   // 心情紀錄與 30 天曲線
   const MOODS = ["", "😞", "🙁", "😐", "🙂", "😄"];
   const MOOD_WORDS = ["", "很糟", "不太好", "普通", "還不錯", "很好"];
-  const moods = load("mood-log", {});
+  const moods = load("mood-log", {}, isObj);
+  // 只接受 1～5 的整數，壞掉的值當作沒記錄
+  const moodOn = d => { const m = moods[dateKey(d)]; return Number.isInteger(m) && m >= 1 && m <= 5 ? m : 0; };
   const avgOf = (from, to) => {
     const v = [];
-    for (let i = from; i <= to; i++) { const m = moods[dateKey(daysAgo(i))]; if (m) v.push(m); }
+    for (let i = from; i <= to; i++) { const m = moodOn(daysAgo(i)); if (m) v.push(m); }
     return v.length ? { avg: v.reduce((a, b) => a + b) / v.length, n: v.length } : null;
   };
   const renderMood = () => {
-    const today = moods[dateKey(new Date())];
+    const today = moodOn(new Date());
     document.querySelectorAll("#moods button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.v === today));
     const last = avgOf(0, 6), prev = avgOf(7, 13);
     let msg = today ? `今天記錄了：${MOODS[today]} ${MOOD_WORDS[today]}。` : "今天還沒記錄。點一個最接近的就好。";
@@ -2319,7 +2349,7 @@ ${num(qs, "（請勾選至少一個問題）")}
     }
     const pts = [];
     for (let i = 0; i < 30; i++) {
-      const m = moods[dateKey(daysAgo(29 - i))];
+      const m = moodOn(daysAgo(29 - i));
       if (m) pts.push([x(i), y(m)]);
     }
     [0, 15, 29].forEach(i => {

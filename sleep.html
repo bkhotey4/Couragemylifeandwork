@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>整夜睡眠音樂</title>
-<meta name="description" content="在瀏覽器裡即時生成的睡眠音樂，可播放 30 分鐘到 8 小時：海浪、細雨、溫柔和弦與遠方鈴聲。">
+<meta name="description" content="在瀏覽器裡即時生成的睡眠音樂，可整夜播放：海浪、細雨、溫柔和弦與遠方鈴聲。">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#b5452b">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -93,7 +93,7 @@
 
   <div class="orb-wrap"><div class="orb"></div></div>
   <div class="hint" id="hint">選一種呼吸節奏，跟著光慢慢呼吸</div>
-  <div class="time" id="time">7:00:00</div>
+  <div class="time" id="time"></div>
 
   <div class="row">
     <select id="len" aria-label="播放長度">
@@ -150,7 +150,7 @@
   </div>
 
   <p class="note">
-    可選 30 分鐘到 8 小時。音樂會在結尾慢慢淡出（整夜模式只淡出最後 30 分鐘），時間到自動停止。<br>
+    可選 <span id="len-range">30 分鐘到 8 小時</span>。音樂會在結尾慢慢淡出（整夜模式只淡出最後 30 分鐘），時間到自動停止。<br>
     部分手機（尤其 iPhone）在螢幕鎖定後會暫停網頁聲音，建議把螢幕亮度調到最低、保持畫面開著，或接上藍牙喇叭。
   </p>
 </div>
@@ -292,7 +292,7 @@
     wet.gain.value = 0.6;
     reverb.connect(wet).connect(user);
 
-    const bus = name => { const g = ctx.createGain(); g.connect(user); return g; };
+    const bus = () => { const g = ctx.createGain(); g.connect(user); return g; };
     const waves = bus(), rain = bus(), pad = bus(), bells = bus();
     const fire = bus(), birds = bus(), wind = bus(), noise = bus();
     pad.connect(reverb);
@@ -539,7 +539,9 @@
     const mode = $("story").value;
     if (!hasSpeech || mode === "off") return;
     if (!storyPool) { $("story-now").textContent = "故事還沒載入，這次先只播放音樂。"; return; }
-    const pool = mode === "any" ? storyPool : storyPool.filter(s => s.c === mode);
+    let pool = mode === "any" ? storyPool : storyPool.filter(s => s.c === mode);
+    if (!pool.length) pool = storyPool;
+    if (!pool.length) { $("story-now").textContent = "找不到故事，這次先只播放音樂。"; return; }
     const s = pool[Math.floor(Math.random() * pool.length)];
     const voices = speechSynthesis.getVoices();
     const voice = voices.find(v => /zh[-_]TW/i.test(v.lang)) || voices.find(v => /^zh/i.test(v.lang));
@@ -551,7 +553,7 @@
       if (voice) u.voice = voice;
       u.rate = 0.82;
       u.volume = 0.85;
-      if (i === chunks.length - 1) u.onend = () => { $("story-now").textContent = ""; };
+      if (i === chunks.length - 1) u.onend = u.onerror = () => { $("story-now").textContent = ""; };
       speechSynthesis.speak(u);
     });
     $("story-now").textContent = "📖 正在朗讀：" + s.title;
@@ -594,6 +596,11 @@
     document.querySelectorAll(".presets button").forEach(b => b.setAttribute("aria-pressed", "false"));
     applyMix();
   }));
+
+  // 倒數時間與說明文字都從播放長度選單算出來，改選單時不用另外改這裡
+  const lenOpts = $("len").options;
+  $("time").textContent = fmt(+$("len").value * 60);
+  $("len-range").textContent = `${lenOpts[0].text}到 ${lenOpts[lenOpts.length - 1].text}`;
 })();
 </script>
 <script>
