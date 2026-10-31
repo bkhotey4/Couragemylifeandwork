@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>整夜睡眠音樂</title>
 <meta name="description" content="在瀏覽器裡即時生成的睡眠音樂，可播放 30 分鐘到 8 小時：海浪、細雨、溫柔和弦與遠方鈴聲。">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#b5452b">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="再站起來">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
@@ -42,14 +49,15 @@
     width: 150px; height: 150px; border-radius: 50%;
     background: radial-gradient(circle at 40% 35%, var(--accent), transparent 70%);
     box-shadow: 0 0 80px 20px var(--glow);
-    opacity: .55;
-    transform: scale(.8);
+    opacity: .5;
+    transform: scale(.9);
+    transition: transform 3s ease-in-out, opacity 3s ease-in-out;
   }
-  .playing .orb { animation: breathe 12s ease-in-out infinite; }
-  @keyframes breathe {
-    0%, 100% { transform: scale(.8); opacity: .45; }
-    45% { transform: scale(1.12); opacity: .8; }
-  }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 26px 0 0; }
+  .presets button { padding: 6px 14px; font-size: .92rem; }
+  .presets button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .mixer h2 { font-size: .95rem; font-weight: 500; color: var(--ink); margin: 14px 0 4px; }
+  .mixer h2:first-child { margin-top: 0; }
   .hint { color: var(--muted); font-size: .9rem; min-height: 1.7em; }
   .time { font-size: 2.6rem; font-variant-numeric: tabular-nums; letter-spacing: .04em; margin: 8px 0 20px; }
   .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -81,10 +89,10 @@
 <div class="wrap" id="app">
   <a class="back" href="./">← 回到「考績之後，再站起來」</a>
   <h1>今晚，先好好睡一覺</h1>
-  <p class="sub">海浪、細雨、溫柔的和弦與遠方的鈴聲。<br>每一次播放都是即時生成，不會完全重複。</p>
+  <p class="sub">海浪、雨聲、營火、森林、溫柔的和弦與遠方的鈴聲。<br>每一次播放都是即時生成，不會完全重複。</p>
 
   <div class="orb-wrap"><div class="orb"></div></div>
-  <div class="hint" id="hint">跟著光慢慢吸氣、慢慢吐氣</div>
+  <div class="hint" id="hint">選一種呼吸節奏，跟著光慢慢呼吸</div>
   <div class="time" id="time">7:00:00</div>
 
   <div class="row">
@@ -101,11 +109,35 @@
     <button class="primary" id="play" type="button">開始播放</button>
     <button id="stop" type="button" disabled>結束</button>
   </div>
+  <div class="row" style="margin-top:10px">
+    <select id="breath" aria-label="呼吸引導">
+      <option value="calm" selected>呼吸引導：自然放鬆（吸 5 吐 7）</option>
+      <option value="478">呼吸引導：4-7-8 助眠呼吸</option>
+      <option value="box">呼吸引導：方塊呼吸（4-4-4-4）</option>
+      <option value="off">不要呼吸引導</option>
+    </select>
+  </div>
+
+  <div class="presets" role="group" aria-label="音景">
+    <button type="button" data-p="default" aria-pressed="true">🌙 預設</button>
+    <button type="button" data-p="sea" aria-pressed="false">🌊 海邊</button>
+    <button type="button" data-p="rain" aria-pressed="false">🌧 雨夜</button>
+    <button type="button" data-p="fire" aria-pressed="false">🔥 營火</button>
+    <button type="button" data-p="forest" aria-pressed="false">🌲 森林</button>
+    <button type="button" data-p="white" aria-pressed="false">📻 白噪音</button>
+  </div>
 
   <div class="mixer">
+    <h2>音量</h2>
     <label>總音量 <input id="v-master" type="range" min="0" max="1" step="0.01" value="0.7"></label>
+    <h2>大自然</h2>
     <label>海浪 <input id="v-waves" type="range" min="0" max="1" step="0.01" value="0.6"></label>
-    <label>細雨 <input id="v-rain" type="range" min="0" max="1" step="0.01" value="0.3"></label>
+    <label>雨聲 <input id="v-rain" type="range" min="0" max="1" step="0.01" value="0.3"></label>
+    <label>營火 <input id="v-fire" type="range" min="0" max="1" step="0.01" value="0"></label>
+    <label>鳥鳴 <input id="v-birds" type="range" min="0" max="1" step="0.01" value="0"></label>
+    <label>風聲 <input id="v-wind" type="range" min="0" max="1" step="0.01" value="0"></label>
+    <label>白噪音 <input id="v-noise" type="range" min="0" max="1" step="0.01" value="0"></label>
+    <h2>音樂</h2>
     <label>和弦 <input id="v-pad" type="range" min="0" max="1" step="0.01" value="0.55"></label>
     <label>鈴聲 <input id="v-bells" type="range" min="0" max="1" step="0.01" value="0.35"></label>
   </div>
@@ -132,8 +164,34 @@
   ];
   const BELLS = [72, 74, 76, 79, 81, 84]; // C 大調五聲音階
 
-  let ctx = null, nodes = null, timer = null;
+  const MIX = ["master", "waves", "rain", "fire", "birds", "wind", "noise", "pad", "bells"];
+  const PRESETS = {
+    default: { waves: .6, rain: .3, fire: 0, birds: 0, wind: 0, noise: 0, pad: .55, bells: .35 },
+    sea:     { waves: .75, rain: 0, fire: 0, birds: 0, wind: .2, noise: 0, pad: .45, bells: .3 },
+    rain:    { waves: 0, rain: .8, fire: 0, birds: 0, wind: .25, noise: 0, pad: .4, bells: .15 },
+    fire:    { waves: 0, rain: 0, fire: .8, birds: 0, wind: .2, noise: 0, pad: .35, bells: .1 },
+    forest:  { waves: 0, rain: .1, fire: 0, birds: .5, wind: .45, noise: 0, pad: .35, bells: .2 },
+    white:   { waves: 0, rain: 0, fire: 0, birds: 0, wind: 0, noise: .7, pad: 0, bells: 0 }
+  };
+  // 呼吸節奏：[提示文字, 秒數, 光球大小]
+  const BREATH = {
+    calm: [["吸氣", 5, 1.12], ["吐氣", 7, .8]],
+    "478": [["吸氣", 4, 1.12], ["屏住呼吸", 7, 1.12], ["慢慢吐氣", 8, .8]],
+    box: [["吸氣", 4, 1.12], ["屏住", 4, 1.12], ["吐氣", 4, .8], ["停住", 4, .8]]
+  };
+
+  let ctx = null, nodes = null, timer = null, breathTimer = null, playing = false;
   let startAt = 0, total = 0, nextChord = 0, nextBell = 0, lastChord = -1;
+
+  // 頭尾各淡入淡出 50 毫秒，循環播放時接縫才不會有「喀」聲
+  function loopFade(buf) {
+    const n = Math.floor(buf.sampleRate * 0.05);
+    for (let ch = 0; ch < buf.numberOfChannels; ch++) {
+      const d = buf.getChannelData(ch);
+      for (let i = 0; i < n; i++) { d[i] *= i / n; d[d.length - 1 - i] *= i / n; }
+    }
+    return buf;
+  }
 
   function noiseBuffer(type) {
     const len = ctx.sampleRate * 12;
@@ -146,6 +204,61 @@
         if (type === "brown") { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
         else d[i] = w;
       }
+    }
+    return loopFade(buf);
+  }
+
+  // 營火：低沉的燃燒聲，加上隨機、短促的劈啪聲
+  function fireBuffer() {
+    const sr = ctx.sampleRate, sec = 30, len = sr * sec;
+    const buf = ctx.createBuffer(2, len, sr);
+    const L = buf.getChannelData(0), R = buf.getChannelData(1);
+    let b = 0;
+    for (let i = 0; i < len; i++) { b = (b + 0.02 * (Math.random() * 2 - 1)) / 1.02; L[i] = R[i] = b * 1.5; }
+    let t = 0;
+    while (t < sec) {
+      t += -Math.log(1 - Math.random()) / 5;
+      const start = Math.floor(t * sr);
+      const amp = Math.random() < 0.1 ? 0.8 : 0.12 + Math.random() * 0.3;
+      const dur = Math.floor(sr * (0.002 + Math.random() * 0.012));
+      const pan = Math.random();
+      for (let j = 0; j < dur && start + j < len; j++) {
+        const v = (Math.random() * 2 - 1) * amp * Math.exp(-j / (dur / 4));
+        L[start + j] += v * (1 - pan * 0.6);
+        R[start + j] += v * (0.4 + pan * 0.6);
+      }
+    }
+    return loopFade(buf);
+  }
+
+  // 鳥鳴：偶爾出現的一串短促、滑音的啁啾聲
+  function birdBuffer() {
+    const sr = ctx.sampleRate, sec = 60, len = sr * sec;
+    const buf = ctx.createBuffer(2, len, sr);
+    const L = buf.getChannelData(0), R = buf.getChannelData(1);
+    let t = 1;
+    while (t < sec - 2) {
+      const notes = 2 + Math.floor(Math.random() * 5);
+      const base = 2200 + Math.random() * 2500;
+      const pan = Math.random();
+      const amp = 0.06 + Math.random() * 0.1;
+      let nt = t;
+      for (let n = 0; n < notes; n++) {
+        const d = 0.05 + Math.random() * 0.1;
+        const f0 = base * (0.9 + Math.random() * 0.3);
+        const f1 = f0 * (Math.random() < 0.5 ? 1.25 : 0.8);
+        const s = Math.floor(nt * sr), N = Math.floor(d * sr);
+        let ph = 0;
+        for (let j = 0; j < N && s + j < len; j++) {
+          const p = j / N;
+          ph += 2 * Math.PI * (f0 + (f1 - f0) * p) / sr;
+          const v = Math.sin(ph) * Math.sin(Math.PI * p) * amp;
+          L[s + j] += v * (1 - pan);
+          R[s + j] += v * pan;
+        }
+        nt += d + 0.03 + Math.random() * 0.08;
+      }
+      t = nt + 1.5 + Math.random() * 5;
     }
     return buf;
   }
@@ -174,8 +287,10 @@
 
     const bus = name => { const g = ctx.createGain(); g.connect(user); return g; };
     const waves = bus(), rain = bus(), pad = bus(), bells = bus();
+    const fire = bus(), birds = bus(), wind = bus(), noise = bus();
     pad.connect(reverb);
     bells.connect(reverb);
+    birds.connect(reverb);
 
     // 海浪：低通的布朗噪音，用極慢的 LFO 推拉音量
     const brown = ctx.createBufferSource();
@@ -210,19 +325,100 @@
     padLp.frequency.value = 1100;
     padLp.connect(pad);
 
+    // 營火
+    const fireSrc = ctx.createBufferSource();
+    fireSrc.buffer = fireBuffer();
+    fireSrc.loop = true;
+    const fireLp = ctx.createBiquadFilter();
+    fireLp.type = "lowpass";
+    fireLp.frequency.value = 6000;
+    const fireLevel = ctx.createGain();
+    fireLevel.gain.value = 0.6;
+    fireSrc.connect(fireLp).connect(fireLevel).connect(fire);
+
+    // 鳥鳴
+    const birdSrc = ctx.createBufferSource();
+    birdSrc.buffer = birdBuffer();
+    birdSrc.loop = true;
+    birdSrc.connect(birds);
+
+    // 風聲：帶通的布朗噪音，中心頻率和音量都緩慢飄動
+    const windSrc = ctx.createBufferSource();
+    windSrc.buffer = brown.buffer;
+    windSrc.loop = true;
+    windSrc.playbackRate.value = 0.9;
+    const windBp = ctx.createBiquadFilter();
+    windBp.type = "bandpass";
+    windBp.frequency.value = 450;
+    windBp.Q.value = 0.9;
+    const windLfo = ctx.createOscillator();
+    windLfo.frequency.value = 0.05;
+    const windLfoDepth = ctx.createGain();
+    windLfoDepth.gain.value = 250;
+    windLfo.connect(windLfoDepth).connect(windBp.frequency);
+    const gust = ctx.createGain();
+    gust.gain.value = 0.7;
+    const gustLfo = ctx.createOscillator();
+    gustLfo.frequency.value = 0.031;
+    const gustDepth = ctx.createGain();
+    gustDepth.gain.value = 0.35;
+    gustLfo.connect(gustDepth).connect(gust.gain);
+    windSrc.connect(windBp).connect(gust).connect(wind);
+
+    // 白噪音：稍微柔化高頻，聽起來比較不刺耳
+    const noiseSrc = ctx.createBufferSource();
+    noiseSrc.buffer = white.buffer;
+    noiseSrc.loop = true;
+    noiseSrc.loopStart = 5.3;
+    const noiseLp = ctx.createBiquadFilter();
+    noiseLp.type = "lowpass";
+    noiseLp.frequency.value = 3500;
+    const noiseLevel = ctx.createGain();
+    noiseLevel.gain.value = 0.15;
+    noiseSrc.connect(noiseLp).connect(noiseLevel).connect(noise);
+
     brown.start(); white.start(); lfo.start();
-    nodes = { user, fade, waves, rain, pad, bells, padLp };
+    fireSrc.start(); birdSrc.start(); windSrc.start(); windLfo.start(); gustLfo.start(); noiseSrc.start(0, 5.3);
+    nodes = { user, fade, waves, rain, pad, bells, fire, birds, wind, noise, padLp };
     applyMix();
   }
 
   function applyMix() {
     if (!nodes) return;
     const t = ctx.currentTime;
-    nodes.user.gain.setTargetAtTime(+$("v-master").value, t, 0.3);
-    nodes.waves.gain.setTargetAtTime(+$("v-waves").value, t, 0.3);
-    nodes.rain.gain.setTargetAtTime(+$("v-rain").value, t, 0.3);
-    nodes.pad.gain.setTargetAtTime(+$("v-pad").value * 0.5, t, 0.3);
-    nodes.bells.gain.setTargetAtTime(+$("v-bells").value * 0.5, t, 0.3);
+    const scale = { master: 1, pad: 0.5, bells: 0.5 };
+    MIX.forEach(k => {
+      const node = k === "master" ? nodes.user : nodes[k];
+      node.gain.setTargetAtTime(+$("v-" + k).value * (scale[k] || 1), t, 0.3);
+    });
+  }
+
+  function setPreset(name) {
+    const p = PRESETS[name];
+    Object.keys(p).forEach(k => { $("v-" + k).value = p[k]; });
+    document.querySelectorAll(".presets button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === name ? "true" : "false"));
+    applyMix();
+  }
+
+  // 呼吸引導：用 JS 控制光球的放大縮小與提示文字
+  function breathe(i) {
+    clearTimeout(breathTimer);
+    const orb = document.querySelector(".orb");
+    const mode = $("breath").value;
+    if (!playing || mode === "off") {
+      orb.style.transition = "transform 3s ease-in-out, opacity 3s ease-in-out";
+      orb.style.transform = "scale(.9)";
+      orb.style.opacity = ".5";
+      if (playing) $("hint").textContent = "靜靜聽就好";
+      return;
+    }
+    const steps = BREATH[mode];
+    const [label, sec, size] = steps[i % steps.length];
+    orb.style.transition = `transform ${sec}s ease-in-out, opacity ${sec}s ease-in-out`;
+    orb.style.transform = `scale(${size})`;
+    orb.style.opacity = size > 1 ? ".85" : ".45";
+    $("hint").textContent = `${label}…… ${sec} 秒`;
+    breathTimer = setTimeout(() => breathe(i + 1), sec * 1000);
   }
 
   function playChord(at, dur) {
@@ -332,22 +528,33 @@
     $("stop").disabled = true;
     $("len").disabled = false;
     $("time").textContent = fmt(+$("len").value * 60);
-    $("hint").textContent = finished ? "晚安。明天的你，會比今天更有力量。" : "跟著光慢慢吸氣、慢慢吐氣";
+    $("hint").textContent = finished ? "晚安。明天的你，會比今天更有力量。" : "選一種呼吸節奏，跟著光慢慢呼吸";
   }
 
   function setPlaying(on, paused) {
-    $("app").classList.toggle("playing", on);
+    playing = on;
     $("play").textContent = on ? "暫停" : (paused ? "繼續" : "開始播放");
     $("stop").disabled = false;
     $("len").disabled = true;
-    $("hint").textContent = on ? "吸氣……　　吐氣……" : (paused ? "已暫停" : $("hint").textContent);
+    breathe(0);
+    if (paused) $("hint").textContent = "已暫停";
   }
 
   $("play").addEventListener("click", () => (ctx ? togglePause() : start()));
   $("stop").addEventListener("click", () => stop(false));
   $("len").addEventListener("change", () => { $("time").textContent = fmt(+$("len").value * 60); });
-  document.querySelectorAll(".mixer input").forEach(el => el.addEventListener("input", applyMix));
+  $("breath").addEventListener("change", () => breathe(0));
+  document.querySelectorAll(".presets button").forEach(b => b.addEventListener("click", () => setPreset(b.dataset.p)));
+  document.querySelectorAll(".mixer input").forEach(el => el.addEventListener("input", () => {
+    document.querySelectorAll(".presets button").forEach(b => b.setAttribute("aria-pressed", "false"));
+    applyMix();
+  }));
 })();
+</script>
+<script>
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
 </script>
 </body>
 </html>

@@ -4,7 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>考績之後，再站起來</title>
-<meta name="description" content="給被考績打擊的科技人：七十則故事，關於跌倒後怎麼站起來，以及怎麼放下。">
+<meta name="description" content="給被考績打擊的科技人：一百則故事，關於跌倒後怎麼站起來，以及怎麼放下。">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#b5452b">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="再站起來">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -107,6 +114,29 @@
     font-weight: 500;
   }
   .story .lesson::before { content: "給今天的你 → "; color: var(--accent); }
+  .story { scroll-margin-top: 16px; transition: box-shadow .4s, border-color .4s; }
+  .story.picked { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .install {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+    margin-top: 18px; padding: 14px 18px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  }
+  .install[hidden] { display: none; }
+  .install span { color: var(--muted); font-size: .92rem; flex: 1 1 220px; }
+  .install button { margin: 0; }
+  .finder { display: flex; gap: 10px; flex-wrap: wrap; margin: 40px 0 6px; }
+  .finder input {
+    flex: 1 1 220px;
+    font: inherit;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .finder button { margin: 0; }
+  .finder + .hint { margin: 0; }
+  nav.filters { margin-top: 14px; }
   section.toolkit { margin: 56px 0; }
   section.toolkit h2 { font-family: "Noto Serif TC", serif; font-size: 1.7rem; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
@@ -155,6 +185,11 @@
     <h1>考績只是一張表，<br>不是你這個人的定論。</h1>
     <p class="lead">在半導體與科技業，一次考績可能讓人懷疑自己好幾個月。但歷史上許多人，都曾在更低的谷底被「打了很差的分數」——後來卻寫出了最好的作品。下面這幾則真實故事，送給剛拿到考績、需要喘一口氣的你。</p>
     <p class="lead"><a href="#repair" style="color:var(--accent)">🛠 自我修復：30 天計畫 →</a><br><a href="sleep.html" style="color:var(--accent)">🌙 睡不著？聽整夜的睡眠音樂（最長 8 小時） →</a></p>
+    <div class="install" id="install" hidden>
+      <b>📱 把這裡加到手機主畫面</b>
+      <span id="install-how"></span>
+      <button type="button" id="install-btn" hidden>加到主畫面</button>
+    </div>
 
     <div class="quote-box" aria-live="polite">
       <p id="q-text">莫聽穿林打葉聲，何妨吟嘯且徐行。</p>
@@ -162,6 +197,12 @@
       <button id="q-btn" type="button">換一句</button>
     </div>
   </header>
+
+  <div class="finder">
+    <input id="search" type="search" placeholder="搜尋故事：裁員、降職、半導體、蘇東坡……" aria-label="搜尋故事">
+    <button type="button" id="random">🎲 今天抽一則</button>
+  </div>
+  <p class="hint" id="count"></p>
 
   <nav class="filters" aria-label="篩選故事">
     <button type="button" data-f="all" aria-pressed="true">全部</button>
@@ -323,6 +364,56 @@
       <h3>站起來</h3>
       <p>他們發現，開發遊戲時自己做來溝通用的內部聊天工具反而很好用，於是把它改造成產品，這就是 Slack。後來 Slack 成為全球最普及的工作溝通工具之一。</p>
       <p class="lesson">一個失敗的專案裡，常常藏著你順手做出來、真正有價值的東西。回頭看看，你今年做的事裡有沒有這種寶藏？</p>
+    </article>
+
+    <article class="story" data-c="tech">
+      <div class="meta"><h2>哈伯望遠鏡：花了幾十億，鏡片卻磨錯了</h2></div>
+      <div class="when">1990–1993</div>
+      <h3>谷底</h3>
+      <p>哈伯太空望遠鏡在 1990 年升空後，科學家發現拍回來的影像模糊不清。原因是主鏡在製造時被磨錯了形狀，誤差大約只有頭髮粗細的五十分之一，卻足以讓整台望遠鏡「近視」。它成了深夜脫口秀的笑柄，整個團隊承受巨大壓力。</p>
+      <h3>站起來</h3>
+      <p>工程師沒有放棄，設計出一組「矯正眼鏡」光學系統。1993 年太空人上太空完成維修，哈伯從此拍出無數震撼世界的宇宙影像，成為史上最成功的科學儀器之一。</p>
+      <p class="lesson">出了大包，不等於整個專案失敗。工程師的價值，常常就展現在「怎麼把錯的修好」。</p>
+    </article>
+
+    <article class="story" data-c="tech">
+      <div class="meta"><h2>阿波羅 13 號：「成功的失敗」</h2></div>
+      <div class="when">1970</div>
+      <h3>谷底</h3>
+      <p>1970 年，阿波羅 13 號在前往月球途中氧氣槽爆炸，登月任務被迫取消。太空船電力、氧氣嚴重不足，船艙裡的二氧化碳還在不斷上升，三名太空人隨時可能回不了家。</p>
+      <h3>站起來</h3>
+      <p>地面的工程團隊日夜趕工，把登月艙改當救生艇，還用太空船上現有的塑膠袋、紙板、膠帶，拼出讓方形濾罐接上圓形接口的轉接裝置。三名太空人最後平安返回地球，這次任務被稱為「成功的失敗」。</p>
+      <p class="lesson">原本的目標達不到時，就重新定義成功：把人平安帶回家，也是一種了不起的成就。</p>
+    </article>
+
+    <article class="story" data-c="tech">
+      <div class="meta"><h2>三星：在員工面前燒掉十五萬支不良品</h2></div>
+      <div class="when">1993–1995</div>
+      <h3>谷底</h3>
+      <p>1990 年代初，三星的產品被認為是「便宜但品質差」的代名詞。會長李健熙發現公司手機不良率很高，連送給員工當禮物的手機都有問題。</p>
+      <h3>站起來</h3>
+      <p>1993 年他在法蘭克福說出「除了老婆和孩子，一切都要改變」。1995 年，他下令把約十五萬支不良手機和設備集中到工廠廣場，在兩千名員工面前燒毀。之後三星全面重整品質管理，逐步成為全球電子業的龍頭之一。</p>
+      <p class="lesson">面對品質問題，最痛的方式往往也最有效：不掩飾、不找藉口，徹底改。</p>
+    </article>
+
+    <article class="story" data-c="tech">
+      <div class="meta"><h2>便利貼：一種「黏不牢」的失敗膠水</h2></div>
+      <div class="when">1968–1980</div>
+      <h3>谷底</h3>
+      <p>3M 的科學家史賓瑟·席爾佛原本想研發超強力膠水，結果做出一種黏性很弱、撕下來不留痕跡的膠。這被當成失敗品，他到處推銷好幾年，都沒人知道能拿來做什麼。</p>
+      <h3>站起來</h3>
+      <p>同事亞特·傅萊在教會唱詩班時，因為書籤老是掉出歌本而苦惱，想到可以用這種膠。經過多年開發，1980 年便利貼正式上市，成為 3M 最暢銷的產品之一。</p>
+      <p class="lesson">今年被認為「沒用」的成果，換個人、換個場景可能就是寶。把你做過的東西分享出去。</p>
+    </article>
+
+    <article class="story" data-c="tech">
+      <div class="meta"><h2>中村修二：被公司叫停的研究，做出藍光 LED</h2></div>
+      <div class="when">1979–2014</div>
+      <h3>谷底</h3>
+      <p>他在德島一家小公司日亞化學當工程師，前十年開發的半導體材料產品都賣得很差，被同事認為是「做不出成果的人」。後來他投入當時大企業都放棄的氮化鎵藍光 LED 研究，新上任的社長還一度下令要他停止。</p>
+      <h3>站起來</h3>
+      <p>他沒有停下來，自己改造實驗設備、日復一日地試。1993 年他做出高亮度藍光 LED，讓白光 LED 照明成為可能。2014 年他與赤崎勇、天野浩一起獲得諾貝爾物理學獎。</p>
+      <p class="lesson">在半導體業，一個方向被主管看衰很常見。如果你有扎實的理由相信它，就繼續累積數據，讓結果說話。</p>
     </article>
 
     <article class="story" data-c="east">
@@ -545,6 +636,76 @@
       <p class="lesson">主流路線走不通時，換一條更適合你的路，可能走得更遠。轉職、轉部門，都不是失敗。</p>
     </article>
 
+    <article class="story" data-c="east">
+      <div class="meta"><h2>張騫：出差十三年，被扣留了兩次</h2></div>
+      <div class="when">西漢 · 前 138–前 126 年</div>
+      <h3>谷底</h3>
+      <p>他奉漢武帝之命出使西域，想聯合大月氏對抗匈奴，一出發就被匈奴抓住，扣留了十多年。好不容易逃出來找到大月氏，對方卻不想打仗，任務失敗。回程途中，他又被匈奴抓了一年多。出發時一百多人，回到長安只剩兩個人。</p>
+      <h3>站起來</h3>
+      <p>雖然沒有完成原本的任務，但他帶回了西域各國的地理、物產與情報，打開了後來的「絲綢之路」，被封為博望侯。</p>
+      <p class="lesson">KPI 沒達成，不代表你沒有創造價值。把你在過程中學到、看到、帶回來的東西整理出來，它可能比原本的目標更重要。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>蘇武：在北海牧羊十九年</h2></div>
+      <div class="when">西漢 · 前 100–前 81 年</div>
+      <h3>谷底</h3>
+      <p>他出使匈奴時因副使牽連被扣留。匈奴威脅利誘要他投降，他不肯，被關在地窖裡挨餓，吞雪、嚼毛氈活下來，後來又被流放到北海（今貝加爾湖一帶）牧羊，被告知要等公羊生了小羊才能回國。</p>
+      <h3>站起來</h3>
+      <p>他手持代表漢朝的旌節，連節上的毛都掉光了也不放下。十九年後漢匈和好，他終於回到長安，受到朝廷尊崇。</p>
+      <p class="lesson">環境再艱難，也可以守住自己的原則和尊嚴。那是任何考績都拿不走的東西。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>林則徐：做對的事，卻被革職流放</h2></div>
+      <div class="when">清 · 1839–1845 年</div>
+      <h3>谷底</h3>
+      <p>他在虎門銷毀大量鴉片，堅決禁煙。但鴉片戰爭爆發後，朝廷把責任推到他身上，將他革職，流放到遙遠的新疆伊犁。</p>
+      <h3>站起來</h3>
+      <p>出發前他寫下「苟利國家生死以，豈因禍福避趨之」。到了新疆，他沒有消沉，而是走遍各地勘察、開墾荒地、推廣水利灌溉。幾年後他被重新起用，再度擔任要職。</p>
+      <p class="lesson">被「背鍋」的感覺很不公平。但無論在哪個位置，你仍然可以繼續做有意義的事，而那些事會被記得。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>文徵明：考了十次都落榜，進了翰林院又被排擠</h2></div>
+      <div class="when">明 · 1495–1559 年</div>
+      <h3>谷底</h3>
+      <p>他從二十多歲開始參加鄉試，前後考了將近十次都沒考上。五十四歲時，他終於被推薦進入翰林院，卻因為不是正規考試出身而被同僚看不起、排擠。</p>
+      <h3>站起來</h3>
+      <p>三年後他辭官回到蘇州，專心書法與繪畫，一直創作到九十歲，成為「吳門四家」之一，在藝術史上的地位遠超過當年那些看不起他的人。</p>
+      <p class="lesson">一個總是看低你的環境，待久了只會消耗你。離開它，去一個能讓你發光的地方。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>黃公望：中年入獄，五十歲才開始學畫</h2></div>
+      <div class="when">元 · 1269–1354 年</div>
+      <h3>谷底</h3>
+      <p>他原本在官府當小吏，四十多歲時因上司的貪汙案受到牽連，被關進監獄，仕途就此斷送。</p>
+      <h3>站起來</h3>
+      <p>出獄後他雲遊四方，大約五十歲才開始專心學畫。七十九歲時開始畫《富春山居圖》，花了好幾年才完成，成為中國山水畫的經典。其中〈無用師卷〉今天收藏在台北故宮。</p>
+      <p class="lesson">被別人的錯連累、人生被打亂，很不公平。但人生的下半場，仍然可以畫出最好的作品。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>劉邦：五十六萬大軍被三萬人擊潰</h2></div>
+      <div class="when">楚漢相爭 · 前 205–前 202 年</div>
+      <h3>谷底</h3>
+      <p>彭城之戰，劉邦率領號稱五十六萬的聯軍攻下項羽的都城，卻被項羽親率的三萬精兵擊潰，士兵死傷無數，連他的父親和妻子都被俘虜，他自己狼狽逃命。此後他對上項羽幾乎是屢戰屢敗。</p>
+      <h3>站起來</h3>
+      <p>他懂得用人、聽勸，讓蕭何守後方、張良出謀略、韓信帶兵，一次次重新集結。三年後的垓下之戰，他終於擊敗項羽，建立漢朝。</p>
+      <p class="lesson">一個人單打獨鬥會累垮。打敗仗的時候，更要靠團隊、靠願意幫你的人一起站起來。</p>
+    </article>
+
+    <article class="story" data-c="east">
+      <div class="meta"><h2>玄奘：沙漠裡四夜五天沒有水</h2></div>
+      <div class="when">唐 · 629–645 年</div>
+      <h3>谷底</h3>
+      <p>他想去天竺求取佛經，申請出國卻沒有獲准，只好私自出關。在莫賀延磧沙漠裡，他不小心打翻了水袋，四夜五天滴水未進，倒在沙漠中幾乎喪命。</p>
+      <h3>站起來</h3>
+      <p>他曾立誓「寧可就西而死，豈歸東而生」，不肯回頭。後來他走到天竺，學習十多年，回到長安時帶回六百多部經典，並用後半生翻譯了一千多卷。</p>
+      <p class="lesson">撐不下去的時候，想想你當初為什麼出發。那個理由，常常就是走下去的力氣。</p>
+    </article>
+
     <article class="story" data-c="west">
       <div class="meta"><h2>邱吉爾：被趕下台，坐了十年冷板凳</h2></div>
       <div class="when">1915 / 1929–1939</div>
@@ -593,6 +754,36 @@
       <h3>站起來</h3>
       <p>他花了數年復健，1928 年當選紐約州長，1932 年當選美國總統，帶領國家走出經濟大蕭條、度過二戰，是唯一連任四屆的美國總統。</p>
       <p class="lesson">當你覺得「我的路斷了」，也許只是需要換一種走法。</p>
+    </article>
+
+    <article class="story" data-c="west">
+      <div class="meta"><h2>法拉第：裝訂書本的學徒，被當成僕人使喚</h2></div>
+      <div class="when">1805–1831</div>
+      <h3>谷底</h3>
+      <p>他出身貧窮，十四歲就去當裝訂書本的學徒，沒受過正規教育。他把著名化學家戴維的演講筆記整理裝訂好寄過去，才爭取到實驗室助手的工作。跟著戴維到歐洲考察時，他還常被戴維夫人當成僕人使喚。</p>
+      <h3>站起來</h3>
+      <p>他把每一個機會都當成學習，最後發現了電磁感應，奠定了發電機和馬達的原理，成為史上最重要的科學家之一。</p>
+      <p class="lesson">被低估、被當成打雜的，也別停止學習。你吸收的每一點知識，都是自己的。</p>
+    </article>
+
+    <article class="story" data-c="west">
+      <div class="meta"><h2>愛迪生：六十七歲，實驗室被大火燒光</h2></div>
+      <div class="when">1914</div>
+      <h3>谷底</h3>
+      <p>1914 年 12 月，愛迪生在西奧蘭治的實驗室與工廠發生大火，多年的設備和研究資料付之一炬，損失非常慘重。這年他已經六十七歲。</p>
+      <h3>站起來</h3>
+      <p>據他兒子的回憶，愛迪生看著大火說：災難也有價值，我們所有的錯誤都被燒掉了，感謝上帝，我們可以重新開始。大火之後不久，工廠就重新運作起來。</p>
+      <p class="lesson">把這次的低分看成一次「歸零」：過去的錯誤留在過去，從今天開始重新累積。</p>
+    </article>
+
+    <article class="story" data-c="west">
+      <div class="meta"><h2>萊特兄弟：腳踏車店老闆，對上政府資助的專家</h2></div>
+      <div class="when">1899–1903</div>
+      <h3>谷底</h3>
+      <p>他們只是經營腳踏車店的兄弟，沒有大學學歷，也沒有政府資金。當時最受矚目的是史密森尼學會會長蘭利，他拿到美國陸軍部的大筆經費研發飛機，所有人都看好他。</p>
+      <h3>站起來</h3>
+      <p>1903 年蘭利的飛機兩次試飛都直接掉進河裡，遭到媒體嘲笑。幾天後的 12 月 17 日，萊特兄弟在北卡羅來納州完成了人類第一次有動力、可操控的飛行。</p>
+      <p class="lesson">資源比不上別人、背景比不上別人，都不是決定性的。持續動手實驗、從錯誤中修正，才是。</p>
     </article>
 
     <article class="story" data-c="modern">
@@ -795,6 +986,136 @@
       <p class="lesson">你的「短處」只是故事的一部分。找到願意投資在你身上的環境，比勉強待在不看好你的地方更重要。</p>
     </article>
 
+    <article class="story" data-c="modern" data-tw>
+      <div class="meta"><h2>周杰倫：寫的歌沒人要唱</h2></div>
+      <div class="when">1997–2000</div>
+      <h3>谷底</h3>
+      <p>他參加電視選秀節目時，表現並不突出，但吳宗憲注意到他寫得很複雜的樂譜，找他到唱片公司當音樂製作助理。他寫了很多歌給其他歌手，卻常常被退回，認為風格太怪、不好唱。</p>
+      <h3>站起來</h3>
+      <p>據吳宗憲的說法，他給周杰倫一個挑戰：十天內寫出五十首歌，就從中挑十首幫他出專輯。周杰倫真的做到了。2000 年首張專輯《Jay》推出，從此改變了華語流行音樂。</p>
+      <p class="lesson">別人說你的風格「太怪」，有時代表你走在前面。被退件的作品，也許只是在等一個屬於它的舞台。</p>
+    </article>
+
+    <article class="story" data-c="modern" data-tw>
+      <div class="meta"><h2>張榮發：四十歲離開原公司，靠一艘二手船創業</h2></div>
+      <div class="when">1961–1968</div>
+      <h3>谷底</h3>
+      <p>他從最基層的船員做起，一路升到船長，後來和朋友合夥經營海運公司，卻因經營理念不合，在四十歲左右被迫離開自己參與創辦的公司。</p>
+      <h3>站起來</h3>
+      <p>1968 年，他用一艘船齡十五年的二手貨輪創立長榮海運，後來發展成全球最大的貨櫃航運公司之一，還創辦了長榮航空。</p>
+      <p class="lesson">和合作夥伴、主管理念不合而離開，不是失敗。帶著你的經驗和堅持，從一艘小船開始也可以。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>王薇薇：奧運夢碎，又沒升上總編輯</h2></div>
+      <div class="when">1968–1990</div>
+      <h3>谷底</h3>
+      <p>她從小練花式滑冰，卻沒能入選 1968 年美國奧運代表隊。之後她在《Vogue》雜誌工作了十七年，做到資深時尚編輯，卻在總編輯職缺出現時沒有被選上。</p>
+      <h3>站起來</h3>
+      <p>她離開《Vogue》，在四十歲時開了自己的婚紗店，從婚紗設計起家，成為世界知名的時尚品牌。</p>
+      <p class="lesson">在公司待了很多年卻沒升上去，可能是在提醒你：你的舞台不在這張組織圖上。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>茱莉亞·柴爾德：三十七歲學做菜，食譜被退稿</h2></div>
+      <div class="when">1949–1963</div>
+      <h3>谷底</h3>
+      <p>她三十七歲才進入巴黎藍帶廚藝學校學習，和朋友花了將近十年寫法國料理食譜，結果原本簽約的出版社看完後覺得太厚、太像百科全書，拒絕出版。</p>
+      <h3>站起來</h3>
+      <p>1961 年，另一家出版社願意出版《精通法式烹飪藝術》，這時她已經四十九歲。這本書大受歡迎，她後來主持電視烹飪節目，改變了美國人做菜的方式。</p>
+      <p class="lesson">花了很多年做的東西被打回票，很痛。但同一份作品，換一個懂它的人來看，結果可能完全不同。</p>
+    </article>
+
+    <article class="story" data-c="modern" data-tw>
+      <div class="meta"><h2>陳偉殷：手術後在二軍蹲了好幾年</h2></div>
+      <div class="when">2004–2012</div>
+      <h3>谷底</h3>
+      <p>他高中畢業就到日本加入中日龍隊，卻在 2005 年手肘受傷，接受韌帶重建手術。之後好幾年他都在二軍復健、調整，很多人以為他就這樣沉寂了。</p>
+      <h3>站起來</h3>
+      <p>2009 年他拿下日本中央聯盟防禦率王，2012 年登上美國大聯盟，加入金鶯隊後成為主力先發投手。</p>
+      <p class="lesson">受傷、復健、在後段班蹲著的日子很漫長。但只要每天都在進步，總有回到一軍的一天。</p>
+    </article>
+
+    <article class="story" data-c="modern" data-tw>
+      <div class="meta"><h2>戴勝益：創業失敗了好幾次，才做出王品</h2></div>
+      <div class="when">1980 年代–1993</div>
+      <h3>谷底</h3>
+      <p>據他自己的說法，在創立王品之前，他嘗試過好幾種生意，從遊樂園到各種餐飲，接連失敗、虧損，一次又一次重來。</p>
+      <h3>站起來</h3>
+      <p>1993 年他創立王品牛排，後來發展成擁有多個品牌的大型餐飲集團。他常說，失敗的經驗讓他學會怎麼做對的事。</p>
+      <p class="lesson">失敗不是記在你名字上的污點，而是你付過學費的課程。每一次都讓你更接近答案。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>鈴木一朗：被教練打入二軍</h2></div>
+      <div class="when">1992–1994</div>
+      <h3>谷底</h3>
+      <p>他在 1991 年選秀第四輪才被歐力士隊選中。當時的總教練不喜歡他獨特的「鐘擺式」打擊動作，要他改，他不肯，於是頭兩年大多被放在二軍，幾乎沒有上場機會。</p>
+      <h3>站起來</h3>
+      <p>1994 年新總教練仰木彬上任，讓他用自己的方式打球，他當季就擊出 210 支安打，創下日本職棒紀錄。後來他到美國大聯盟，成為史上最偉大的打者之一。</p>
+      <p class="lesson">一個主管不欣賞你的做法，換一個主管可能就完全不同。別急著否定自己的方式。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>松下幸之助：第一個產品幾乎賣不出去</h2></div>
+      <div class="when">1917–1918</div>
+      <h3>谷底</h3>
+      <p>他九歲就離家當學徒，身體一直不好。二十多歲時帶著妻子和兩個夥伴自行創業，改良了一款電燈插座，結果幾乎賣不出去，窮到要拿衣物去典當，夥伴也相繼離開。</p>
+      <h3>站起來</h3>
+      <p>就在快撐不下去時，他接到一筆電風扇零件的訂單，靠這筆錢活了下來。1918 年他成立松下電器製作所，後來發展成全球知名的 Panasonic。</p>
+      <p class="lesson">撐到最後一刻，常常會有意想不到的轉機。只要還沒放棄，就還在比賽中。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>西蒙·拜爾斯：在奧運決賽中退賽</h2></div>
+      <div class="when">2021–2024</div>
+      <h3>谷底</h3>
+      <p>被視為史上最強體操選手的她，在東京奧運團體決賽中，因為心理狀態導致空中失去方位感，決定退出比賽。她因此承受了大量批評，有人說她「放棄」、「軟弱」。</p>
+      <h3>站起來</h3>
+      <p>她選擇先照顧自己的心理健康，接受治療、慢慢恢復。2024 年巴黎奧運，她回到賽場，拿下三面金牌、一面銀牌。</p>
+      <p class="lesson">承認「我現在需要休息」不是軟弱，而是勇氣。先把自己照顧好，才能再回到戰場。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>菲爾普斯：奧運金牌最多的人，也曾想放棄人生</h2></div>
+      <div class="when">2012–2016</div>
+      <h3>谷底</h3>
+      <p>他是史上獲得最多奧運金牌的選手，但在 2012 年退休後陷入嚴重憂鬱，2014 年又因酒駕被捕。他後來公開說，那段時間他甚至不想活下去。</p>
+      <h3>站起來</h3>
+      <p>他主動接受治療，學著談論自己的感受。2016 年里約奧運，他再拿下五面金牌，之後成為推動心理健康的重要聲音。</p>
+      <p class="lesson">再成功的人也會撐不住。願意開口、尋求專業協助，是一件很勇敢的事。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>史丹·李：快四十歲，想辭掉工作</h2></div>
+      <div class="when">1961–1962</div>
+      <h3>谷底</h3>
+      <p>他在漫畫公司工作了二十年，每天照著老闆的要求寫套路化的故事，覺得工作毫無意義，快四十歲時一心想辭職。</p>
+      <h3>站起來</h3>
+      <p>妻子對他說：既然都要辭職了，不如就照你自己真正想寫的方式寫一次。他寫出了《驚奇四超人》，隔年又創造了《蜘蛛人》，開啟了漫威宇宙。</p>
+      <p class="lesson">如果你已經對工作心灰意冷，不妨在離開前，用你自己的方式好好做一次。結果可能會讓你驚訝。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>力克·胡哲：天生沒有四肢</h2></div>
+      <div class="when">1982 至今</div>
+      <h3>谷底</h3>
+      <p>他出生時就沒有雙手雙腳，在學校常被霸凌，覺得自己是家人的負擔。他後來回憶，大約十歲時曾經想結束自己的生命。</p>
+      <h3>站起來</h3>
+      <p>他慢慢學會用小小的左腳打字、游泳，後來成為激勵演說家，走訪數十個國家，對數百萬人分享不放棄的故事，也組了自己的家庭。</p>
+      <p class="lesson">你今天覺得過不去的坎，不代表永遠過不去。給自己多一點時間，也給自己一點溫柔。</p>
+    </article>
+
+    <article class="story" data-c="modern">
+      <div class="meta"><h2>霍金：二十一歲被宣告只剩兩年</h2></div>
+      <div class="when">1963–2018</div>
+      <h3>谷底</h3>
+      <p>他在劍橋讀博士時被診斷出漸凍症，醫生估計他只剩大約兩年可以活。他一度消沉，覺得做研究已經沒有意義。</p>
+      <h3>站起來</h3>
+      <p>他重新投入研究，在黑洞與宇宙學上做出重大貢獻，寫下暢銷全球的《時間簡史》，活到七十六歲。</p>
+      <p class="lesson">被判定「沒希望」的時候，那只是別人在那一刻的預測，不是你的結局。</p>
+    </article>
+
     <article class="story" data-c="letgo">
       <div class="meta"><h2>愛比克泰德：奴隸出身的哲學家，教人分清「能控制」與「不能控制」</h2></div>
       <div class="when">古羅馬 · 約 50–135 年</div>
@@ -873,6 +1194,26 @@
       <h3>放下</h3>
       <p>他的兒子騎駿馬摔斷了腿，鄰居又來安慰。一年後戰爭爆發，年輕人大多戰死沙場，他的兒子因為腿傷沒被徵召，父子都保住了性命。</p>
       <p class="lesson">今年這張考績是禍是福，現在還說不準。不必急著替它下定論，也不必讓它替你下定論。</p>
+    </article>
+
+    <article class="story" data-c="letgo">
+      <div class="meta"><h2>塞內卡：被流放八年的哲學家，談「想像中的痛苦」</h2></div>
+      <div class="when">古羅馬 · 41–49 年</div>
+      <h3>處境</h3>
+      <p>他是羅馬知名的作家與政治人物，卻被皇帝以莫須有的罪名流放到科西嘉島，一待就是八年，遠離家人和原本的生活。</p>
+      <h3>放下</h3>
+      <p>他在書信中寫道：我們受到驚嚇的次數，往往多於真正受到傷害的次數；我們在想像中承受的痛苦，常常比現實更多。</p>
+      <p class="lesson">擔心薪水、擔心未來時，問問自己：哪些是已經發生的事實，哪些是腦中想像的最壞情況？先處理事實就好。</p>
+    </article>
+
+    <article class="story" data-c="letgo">
+      <div class="meta"><h2>馬可·奧理略：皇帝寫給自己的筆記</h2></div>
+      <div class="when">古羅馬 · 161–180 年</div>
+      <h3>處境</h3>
+      <p>他身為羅馬皇帝，在位期間卻幾乎都在處理壞消息：瘟疫橫行、邊境戰爭不斷，他自己的身體也不好，還有好幾個孩子早逝。</p>
+      <h3>放下</h3>
+      <p>他在軍營裡寫下一本不打算給任何人看的筆記，後來成為《沉思錄》。書裡反覆提醒自己：外在的事情無法傷害你，傷害你的是你對它的看法，而看法是可以調整的。</p>
+      <p class="lesson">試著每天睡前寫幾行字給自己。不用寫得好，只要把心裡的東西放到紙上，它就不會一直壓在胸口。</p>
     </article>
   </main>
 
@@ -1001,6 +1342,33 @@
   });
   updateProgress();
 
+  // 加到主畫面：Android/Chrome 用安裝按鈕，iPhone 顯示操作說明，已安裝就不顯示
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+  const installBox = document.getElementById("install");
+  const installHow = document.getElementById("install-how");
+  const installBtn = document.getElementById("install-btn");
+  if (!standalone) {
+    if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
+      installHow.textContent = "用 Safari 打開，點下方的「分享」按鈕，再選「加入主畫面」。";
+      installBox.hidden = false;
+    }
+    let deferred = null;
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      deferred = e;
+      installHow.textContent = "像 App 一樣從主畫面打開，沒有網路也能看故事。";
+      installBtn.hidden = false;
+      installBox.hidden = false;
+    });
+    installBtn.addEventListener("click", async () => {
+      if (!deferred) return;
+      deferred.prompt();
+      await deferred.userChoice;
+      deferred = null;
+      installBox.hidden = true;
+    });
+  }
+
   // 薪水差額試算：只在頁面上計算，不會傳到任何地方
   const fmtNT = n => "NT$ " + Math.round(n).toLocaleString("zh-TW");
   const calc = () => {
@@ -1015,14 +1383,49 @@
   };
   ["c-exp", "c-act"].forEach(id => document.getElementById(id).addEventListener("input", calc));
 
+  // 分類篩選與關鍵字搜尋會同時生效
+  const stories = [...document.querySelectorAll(".story")];
   const btns = document.querySelectorAll("nav.filters button");
+  const search = document.getElementById("search");
+  let filter = "all";
+  const applyFilters = () => {
+    const words = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    stories.forEach(s => {
+      const inCat = filter === "all" || (filter === "tw" ? s.hasAttribute("data-tw") : s.dataset.c === filter);
+      const text = s.textContent.toLowerCase();
+      s.hidden = !(inCat && words.every(w => text.includes(w)));
+      if (!s.hidden) shown++;
+    });
+    document.getElementById("count").textContent =
+      shown ? `顯示 ${shown} / ${stories.length} 則故事` : "找不到符合的故事，換個關鍵字試試。";
+  };
   btns.forEach(b => b.addEventListener("click", () => {
     btns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
-    document.querySelectorAll(".story").forEach(s => {
-      const f = b.dataset.f;
-      s.hidden = f === "tw" ? !s.hasAttribute("data-tw") : f !== "all" && s.dataset.c !== f;
-    });
+    filter = b.dataset.f;
+    applyFilters();
   }));
+  search.addEventListener("input", applyFilters);
+  applyFilters();
+
+  // 從目前可見的故事裡隨機抽一則，並避免連續抽到同一則
+  let lastPick = null;
+  document.getElementById("random").addEventListener("click", () => {
+    let pool = stories.filter(s => !s.hidden);
+    if (!pool.length) pool = stories;
+    if (pool.length > 1) pool = pool.filter(s => s !== lastPick);
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    lastPick = pick;
+    pick.hidden = false;
+    stories.forEach(s => s.classList.remove("picked"));
+    pick.classList.add("picked");
+    pick.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+</script>
+<script>
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
 </script>
 </body>
 </html>
