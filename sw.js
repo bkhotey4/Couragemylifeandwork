@@ -7,6 +7,7 @@ const FILES = [
   "index.html",
   "sleep.html",
   "books.js",
+  "tools.js",
   "manifest.webmanifest",
   "icons/icon-192.png",
   "icons/icon-512.png",

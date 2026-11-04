@@ -217,6 +217,7 @@
   .panel .checks input { margin-top: 7px; accent-color: var(--accent); flex: none; }
   .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
   .row-btns button { margin: 0; }
+  .row-btns[hidden] { display: none; }
   .wins-list { list-style: none; padding: 0; margin: 10px 0 0; }
   .wins-list li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
   .wins-list .d { color: var(--muted); font-size: .85rem; flex: none; width: 6.2em; padding-top: 2px; }
@@ -241,6 +242,36 @@
   .book .note::before { content: "心得 → "; color: var(--accent); font-weight: 500; }
   .order { background: var(--accent-soft); border-radius: 14px; padding: 16px 20px; margin-top: 24px; }
   .order ol { margin: 6px 0 0; padding-left: 1.4em; }
+  .quick button {
+    margin: 0; padding: 6px 14px; font-size: .92rem;
+    background: var(--accent-soft); color: var(--accent); border: 1px solid var(--line);
+  }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .stat b { display: block; font-family: "Noto Serif TC", serif; font-size: 1.6rem; line-height: 1.3; }
+  .stat span { color: var(--muted); font-size: .9rem; }
+  .panel h3 { font-size: 1.1rem; margin: 0 0 4px; }
+  .next-list { margin: 6px 0 0; padding-left: 1.3em; }
+  .next-list a { color: var(--accent); }
+  .link { color: var(--accent); }
+  .dec-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 8px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .dec-row:first-of-type { border-top: 0; }
+  .dec-row b { grid-column: 1 / -1; }
+  .panel .dec-row label { font-size: .82rem; }
+  .panel .dec-row select { padding: 6px 4px; }
+  .score { margin-top: 12px; }
+  .score div.top { display: flex; justify-content: space-between; font-size: .95rem; }
+  .vent-box { min-height: 180px; transition: opacity 1.4s, filter 1.4s, transform 1.4s; }
+  .vent-box.letting-go { opacity: 0; filter: blur(6px); transform: translateY(-14px); }
+  dialog.card.breath { text-align: center; }
+  .b-stage { display: grid; place-items: center; height: 220px; }
+  .b-orb { width: 140px; height: 140px; border-radius: 50%; background: var(--accent); opacity: .45; transform: scale(.8); }
+  #b-label { font-family: "Noto Serif TC", serif; font-size: 1.3rem; margin: 0; }
+  .breath .row-btns { justify-content: center; }
+  @media (prefers-reduced-motion: reduce) {
+    .vent-box { transition: none; }
+    .b-orb { transition: none !important; }
+  }
   dialog.card { border: 0; border-radius: 16px; padding: 16px; background: var(--surface); color: var(--ink); width: min(92vw, 420px); }
   dialog.card::backdrop { background: rgb(0 0 0 / .55); }
   dialog.card { overflow: hidden; }
@@ -268,10 +299,16 @@
     <h1>考績只是一張表，<br>不是你這個人的定論。</h1>
     <p class="lead">在半導體與科技業，一次考績可能讓人懷疑自己好幾個月。但歷史上許多人，都曾在更低的谷底被「打了很差的分數」——後來卻寫出了最好的作品。下面這幾則真實故事，送給剛拿到考績、需要喘一口氣的你。</p>
     <nav class="quick" aria-label="快速前往">
+      <button type="button" id="b-open">🫁 2 分鐘呼吸</button>
+      <a href="#progress">📊 我的進度</a>
       <a href="#repair">🛠 30 天修復計畫</a>
       <a href="#wins">📝 成果記錄器</a>
+      <a href="#review">📄 自評草稿</a>
       <a href="#talk">💬 主管面談準備</a>
+      <a href="#letters">✉️ 信件範本</a>
       <a href="#mood">🌤 心情紀錄</a>
+      <a href="#vent">🕊 寫完就放下</a>
+      <a href="#decide">🧭 去留決策</a>
       <a href="#books">📚 推薦書單</a>
       <a href="sleep.html">🌙 睡眠音樂（可整夜播放）</a>
     </nav>
@@ -1755,6 +1792,26 @@
     </article>
   </main>
 
+  <section class="tool" id="progress">
+    <h2>📊 我的進度</h2>
+    <p class="lead">好轉常常慢到自己感覺不到。這裡把你做過的事放在一起看，你比自己以為的走得更遠。</p>
+    <div class="stats" id="stats"></div>
+    <div class="panel">
+      <h3>今天可以做的事</h3>
+      <ul class="next-list" id="next-list"></ul>
+    </div>
+    <div class="panel" id="backup">
+      <h3>備份與還原</h3>
+      <p class="hint" id="backup-info"></p>
+      <div class="row-btns">
+        <button type="button" id="backup-save">下載備份檔</button>
+        <button type="button" id="backup-load" class="ghost">從備份檔還原</button>
+        <input type="file" id="backup-file" accept=".json,application/json" hidden>
+      </div>
+      <p class="hint" id="backup-msg" role="status"></p>
+    </div>
+  </section>
+
   <section class="repair" id="repair">
     <h2>自我修復：30 天計畫</h2>
     <p class="lead">考績影響的是真實的薪水，難過和焦慮都很正常。這份計畫不要求你馬上正面思考，只是把接下來一個月拆成做得到的小步驟。打勾的進度只會存在你這台裝置的瀏覽器裡。</p>
@@ -1786,7 +1843,7 @@
         <h3>第 2 週：分開「事實」與「我」</h3>
         <span class="tag">考績是對一段時間的評分，不是對你這個人</span>
         <label><input type="checkbox" data-k="w2a">把考績評語逐條寫下，分成「具體可改的行為」和「制度、配額、主觀感受」兩欄</label>
-        <label><input type="checkbox" data-k="w2b">寫一份今年的成就清單：解過的問題、救過的良率、幫過的人</label>
+        <label><input type="checkbox" data-k="w2b">寫一份今年的成就清單：解過的問題、救過的良率、幫過的人（記進<a href="#wins">成果記錄器</a>）</label>
         <label><input type="checkbox" data-k="w2c">讀三則網頁上的故事，挑一句送給自己</label>
         <label><input type="checkbox" data-k="w2d">每週至少運動兩次，哪怕只是散步 30 分鐘</label>
         <label><input type="checkbox" data-k="w2e">如果連續兩週睡不好、提不起勁，預約 EAP 諮商或身心科</label>
@@ -1796,15 +1853,15 @@
         <span class="tag">把下一次考績，變成可以準備的事</span>
         <label><input type="checkbox" data-k="w3a">約主管一對一，冷靜地問：哪些地方沒達到期待？（可以先用<a href="#talk">面談準備</a>寫好講稿）</label>
         <label><input type="checkbox" data-k="w3b">再問：下個週期做到什麼，才算「超出期待」？請對方說得越具體越好</label>
-        <label><input type="checkbox" data-k="w3c">把答案寫成一份目標清單，並請主管確認</label>
+        <label><input type="checkbox" data-k="w3c">把答案寫成一份目標清單，並請主管確認（可以用<a href="#letters">信件範本</a>）</label>
         <label><input type="checkbox" data-k="w3d">約好每季回顧一次進度，不要等到年底才知道結果</label>
         <label><input type="checkbox" data-k="w3e">開始每週花五分鐘<a href="#wins">記錄成果</a>，留下日期與數字</label>
       </div>
       <div class="week">
         <h3>第 4 週：替自己留後路</h3>
         <span class="tag">不一定要走，但有選擇會安心很多</span>
-        <label><input type="checkbox" data-k="w4a">誠實評估：這次是「我真的可以進步」，還是「環境、主管、位置不適合」？</label>
-        <label><input type="checkbox" data-k="w4b">更新履歷與 LinkedIn，把成就清單放進去</label>
+        <label><input type="checkbox" data-k="w4a">誠實評估：這次是「我真的可以進步」，還是「環境、主管、位置不適合」？（可以用<a href="#decide">去留決策</a>）</label>
+        <label><input type="checkbox" data-k="w4b">更新履歷與 LinkedIn，把成就清單放進去（<a href="#review">自評草稿</a>可以轉成履歷條列）</label>
         <label><input type="checkbox" data-k="w4c">了解內部轉調的機會，或跟一兩位業界朋友聊聊市場</label>
         <label><input type="checkbox" data-k="w4d">挑一項能帶著走的技能或證照，排出接下來三個月的學習時間</label>
         <label><input type="checkbox" data-k="w4e">回頭看第 1 週的自己，寫下一件這個月做得不錯的事</label>
@@ -1814,11 +1871,20 @@
       <button type="button" id="p-print" class="ghost">🖨 列印／存成 PDF</button>
       <button type="button" id="p-reset" class="ghost">清除打勾</button>
     </div>
+    <div class="calc">
+      <h3>📅 放進手機行事曆</h3>
+      <p class="hint">下載一個行事曆檔，打開後加入行事曆。每週會提醒你這週還沒做完的項目，並提醒你連續 12 週記下成果。</p>
+      <div class="calc-row">
+        <label>從哪一天開始<input id="cal-date" type="date"></label>
+        <label>每次提醒的時間<input id="cal-time" type="time" value="20:00"></label>
+      </div>
+      <div class="row-btns"><button type="button" id="cal-make">下載行事曆檔</button></div>
+    </div>
   </section>
 
   <section class="tool" id="wins">
     <h2>📝 成果記錄器</h2>
-    <p class="lead">每週花一分鐘，記下你做到的事。下一次考績面談，這份清單就是你的證據。資料只存在這台裝置的瀏覽器裡，不會上傳；換手機或清除瀏覽器資料前，記得先匯出。</p>
+    <p class="lead">每週花一分鐘，記下你做到的事。下一次考績面談，這份清單就是你的證據。資料只存在這台裝置的瀏覽器裡，不會上傳；換手機或清除瀏覽器資料前，記得先到<a class="link" href="#backup">我的進度</a>下載備份。</p>
     <form class="panel" id="win-form">
       <div class="form-row">
         <label>日期<input type="date" id="win-date" required></label>
@@ -1843,6 +1909,29 @@
     <div class="row-btns" id="win-tools">
       <button type="button" id="win-copy" class="ghost">複製全部</button>
       <button type="button" id="win-export" class="ghost">匯出成文字檔</button>
+    </div>
+  </section>
+
+  <section class="tool" id="review">
+    <h2>📄 自評草稿產生器</h2>
+    <p class="lead">從成果記錄器挑幾筆，整理成 STAR 格式（情境、任務、行動、結果）的自評草稿，或是履歷用的條列。括號裡的地方要你自己補上，那些細節只有你知道。</p>
+    <div class="panel">
+      <label>成果的時間範圍
+        <select id="rv-range">
+          <option value="3">最近 3 個月</option>
+          <option value="6">最近 6 個月</option>
+          <option value="12" selected>最近 12 個月</option>
+          <option value="0">全部</option>
+        </select>
+      </label>
+      <p class="hint" id="rv-hint"></p>
+      <div class="checks" id="rv-list"></div>
+      <div class="row-btns">
+        <button type="button" id="rv-make">產生自評草稿</button>
+        <button type="button" id="rv-cv" class="ghost">產生履歷條列</button>
+        <button type="button" id="rv-copy" class="ghost" hidden>複製</button>
+      </div>
+      <div class="script" id="rv-out" hidden></div>
     </div>
   </section>
 
@@ -1880,6 +1969,34 @@
     </div>
   </section>
 
+  <section class="tool" id="letters">
+    <h2>✉️ 考績後的信件範本</h2>
+    <p class="lead">把談過的事留下文字，對雙方都是保障。選一種情況，填幾個欄位，產生一封語氣平穩的信。內容只在這個頁面上產生，不會傳到任何地方。</p>
+    <div class="panel">
+      <label>要寫哪一種信
+        <select id="l-type">
+          <option value="confirm">面談後的重點確認信</option>
+          <option value="expect">請主管確認下一期的期待</option>
+          <option value="appeal">正式申覆信</option>
+        </select>
+      </label>
+      <p class="hint" id="l-hint"></p>
+      <div class="form-row" style="margin-top:12px">
+        <label>收件人怎麼稱呼（選填）<input id="l-to" placeholder="例如 王經理"></label>
+        <label>你的名字（選填）<input id="l-me"></label>
+        <label>考績週期（選填）<input id="l-period" placeholder="例如 2026 上半年"></label>
+      </div>
+      <label style="margin-top:12px"><span id="l-points-label"></span><textarea id="l-points"></textarea></label>
+      <div class="row-btns" id="l-fill-row"><button type="button" id="l-fill" class="ghost">從成果記錄器帶入</button></div>
+      <label id="l-want-row" style="margin-top:12px" hidden>希望的處理方式<input id="l-want" placeholder="例如 希望重新檢視評等，或請主管說明評分依據"></label>
+      <div class="row-btns">
+        <button type="button" id="l-make">產生信件</button>
+        <button type="button" id="l-copy" class="ghost" hidden>複製信件</button>
+      </div>
+      <div class="script" id="l-out" hidden></div>
+    </div>
+  </section>
+
   <section class="tool" id="mood">
     <h2>🌤 心情紀錄</h2>
     <p class="lead">每天點一下，記錄今天的心情。好轉通常很慢，要看曲線才會發現，自己其實一直在往前走。資料只存在這台裝置。</p>
@@ -1893,6 +2010,43 @@
       </div>
       <p class="hint" id="mood-text"></p>
       <svg id="mood-chart" viewBox="0 0 600 190" role="img" aria-label="最近 30 天的心情曲線"></svg>
+    </div>
+  </section>
+
+  <section class="tool" id="vent">
+    <h2>🕊 寫完就放下</h2>
+    <p class="lead">那些不能對主管說的話，寫在這裡。心理學家 Pennebaker 的研究發現，把情緒寫出來有助於整理壓力。這裡寫的字<b>完全不會存檔、不會上傳</b>，按下「放下」就消失。</p>
+    <div class="panel">
+      <p class="hint" id="v-prompt"></p>
+      <textarea class="vent-box" id="v-text" aria-label="寫下你現在的感受" autocomplete="off" spellcheck="false"></textarea>
+      <div class="row-btns">
+        <button type="button" id="v-drop">放下</button>
+        <button type="button" id="v-next" class="ghost">換一個開頭</button>
+      </div>
+      <p class="hint" id="v-msg" role="status"></p>
+    </div>
+  </section>
+
+  <section class="tool" id="decide">
+    <h2>🧭 去留決策工具</h2>
+    <p class="lead">把腦中一直打轉的問題變成數字。這不是要算出標準答案，而是看清楚自己在意什麼。還在情緒裡的話，先等 48 小時再填。</p>
+    <div class="panel">
+      <p class="hint">1＝很差／不重要，5＝很好／很重要。「重要度」是這一項對你有多重要，另外三欄是每條路在這一項的表現。分數會存在這台裝置。</p>
+      <div id="d-rows"></div>
+      <div id="d-scores"></div>
+      <p class="calc-out" id="d-out"></p>
+      <div class="row-btns"><button type="button" id="d-reset" class="ghost">清除分數</button></div>
+    </div>
+    <div class="calc">
+      <h3>財務跑道：沒有收入能撐多久</h3>
+      <p class="hint">知道自己有幾個月的緩衝，決定時會安心很多。這裡只在頁面上計算，不會存檔，也不會傳到任何地方。</p>
+      <div class="calc-row">
+        <label>可動用的存款<input id="rw-save" type="number" inputmode="numeric" min="0" placeholder="例如 900000"></label>
+        <label>每月必要支出<input id="rw-exp" type="number" inputmode="numeric" min="0" placeholder="例如 45000"></label>
+        <label>離職後每月其他收入（選填）<input id="rw-inc" type="number" inputmode="numeric" min="0" placeholder="例如 0"></label>
+      </div>
+      <p class="calc-out" id="rw-out">輸入存款和每月支出，看看跑道有多長。</p>
+      <p class="hint">離開前也要確認：年終、分紅、股票的發放或歸屬日期；自願離職通常不能請領失業給付。</p>
     </div>
   </section>
 
@@ -1942,6 +2096,17 @@
   </div>
 </dialog>
 
+<dialog class="card breath" id="b-dlg" aria-label="2 分鐘呼吸">
+  <div class="b-stage"><div class="b-orb" id="b-orb"></div></div>
+  <p id="b-label" aria-live="polite"></p>
+  <p class="hint" id="b-left"></p>
+  <p class="hint">真的撐不住的時候，<a class="link" href="tel:1925">1925 安心專線</a> 24 小時都在。</p>
+  <div class="row-btns">
+    <button type="button" id="b-again" hidden>再一輪</button>
+    <button type="button" id="b-close" class="ghost">結束</button>
+  </div>
+</dialog>
+
 <script src="books.js"></script>
 <script>
   const quotes = [
@@ -1967,7 +2132,8 @@
       return v !== null && valid(v) ? v : fallback;
     } catch (e) { return fallback; }
   };
-  const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const dataChanged = () => dispatchEvent(new Event("data-changed"));
+  const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} dataChanged(); };
 
   let qi = 0;
   const showQuote = () => {
@@ -2003,6 +2169,7 @@
     boxes.forEach(b => { b.checked = false; });
     try { localStorage.removeItem(KEY); } catch (e) {}
     updateProgress();
+    dataChanged();
   });
   updateProgress();
 
@@ -2513,6 +2680,7 @@ ${num(qs, "（請勾選至少一個問題）")}
   });
   window.addEventListener("afterprint", () => document.body.classList.remove("print-repair"));
 </script>
+<script src="tools.js"></script>
 <script>
   if ("serviceWorker" in navigator && location.protocol === "https:") {
     navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).catch(() => {});
